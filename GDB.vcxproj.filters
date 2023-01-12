@@ -1,0 +1,444 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\subgraphmatching">
+      <UniqueIdentifier>{3134aa0d-723d-4fa1-8f62-40db1e61f7dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\subgraphmatching">
+      <UniqueIdentifier>{c93819b1-850b-4e99-8e9e-e2454f899efd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\temporal">
+      <UniqueIdentifier>{6c4552c4-4e0b-4013-b081-2b82883722a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\temporal">
+      <UniqueIdentifier>{0ec8c481-02dd-4b1f-8be0-cee7c615b0b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\storage">
+      <UniqueIdentifier>{c12db15e-01b9-440c-8e75-fde9aa81a251}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\storage">
+      <UniqueIdentifier>{fa4b1d6f-c2b3-4fbd-9613-ac3afee5546c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\parser">
+      <UniqueIdentifier>{b4110041-b494-45a5-bc78-c82f427bdf5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\parser">
+      <UniqueIdentifier>{0c161fe0-6ad5-4ec6-910d-a63a56f4c56d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\runtime">
+      <UniqueIdentifier>{8b21ce58-2089-4cfe-a966-73f49f09ac5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\runtime">
+      <UniqueIdentifier>{103c3624-a7cd-43c9-b98f-8c006f769cc7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="subgraphmatching\ComputeSetIntersection.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\config.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\DAF.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\daftypes.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\Match.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\nodesorter.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\probability_strategy.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\SuperGraph.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\TurboGraph.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\TurboMatch.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf2_state.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf2_state_comm.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf2_state_sub.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf2_state_super.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf3_state.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf3_state_bound.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf3_state_in.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf3_state_self.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="subgraphmatching\vf3_state_super.h">
+      <Filter>头文件\subgraphmatching</Filter>
+    </ClInclude>
+    <ClInclude Include="temporal\CommGraphUtil.h">
+      <Filter>头文件\temporal</Filter>
+    </ClInclude>
+    <ClInclude Include="temporal\GraphAnalyzer.h">
+      <Filter>头文件\temporal</Filter>
+    </ClInclude>
+    <ClInclude Include="temporal\GraphGenerator.h">
+      <Filter>头文件\temporal</Filter>
+    </ClInclude>
+    <ClInclude Include="temporal\TemporalGraph.h">
+      <Filter>头文件\temporal</Filter>
+    </ClInclude>
+    <ClInclude Include="temporal\TemporalSearch.h">
+      <Filter>头文件\temporal</Filter>
+    </ClInclude>
+    <ClInclude Include="temporal\TS.h">
+      <Filter>头文件\temporal</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\BigKeyCacheManager.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\BigKeyIndex.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\BigKeyNode.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\BPlusTreeNode.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\Cache.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\CacheManager.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\Clock.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GDBBlock.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GDBEdge.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GDBList.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GDBRegion.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GraphApplication.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GraphIO.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GraphLoader.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GraphQuery.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GraphUpdater.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\IdAlloter.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\IDPool.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\IndexCacheManager.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\LPAT.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\RDB.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\RDBHandler.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\sqlite3.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\StorageMeta.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\TempGraph.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GraphManager.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphDatabase.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\GraphSetManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\definations.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\eval.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\GraphDBBaseListener.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\GraphDBBaseVisitor.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\GraphDBLexer.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\GraphDBListener.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\GraphDBParser.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\GraphDBVisitor.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\graphException.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\GraphParser.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="parser\MyGraphVisitor.h">
+      <Filter>头文件\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphQueryEngineMemory.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryGraph.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphProcessor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tools.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\BPlusTree.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="storage\BPlusTreeUtils.h">
+      <Filter>头文件\storage</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphSchema.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphSchemaManager.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\ComputeSetIntersection.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\DAF.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\Match.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\nodesorter.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\probability_strategy.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\TurboGraph.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\TurboMatch.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf2_state.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf2_state_comm.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf2_state_sub.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf2_state_super.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf3_state.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf3_state_bound.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf3_state_in.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf3_state_self.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\vf3_state_super.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="subgraphmatching\subgraph-matching-main.cpp">
+      <Filter>源文件\subgraphmatching</Filter>
+    </ClCompile>
+    <ClCompile Include="temporal\CommGraphUtil.cpp">
+      <Filter>源文件\temporal</Filter>
+    </ClCompile>
+    <ClCompile Include="temporal\GraphAnalyzer.cpp">
+      <Filter>源文件\temporal</Filter>
+    </ClCompile>
+    <ClCompile Include="temporal\GraphGenerator.cpp">
+      <Filter>源文件\temporal</Filter>
+    </ClCompile>
+    <ClCompile Include="temporal\TemporalSearch.cpp">
+      <Filter>源文件\temporal</Filter>
+    </ClCompile>
+    <ClCompile Include="temporal\TS.cpp">
+      <Filter>源文件\temporal</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\sqlite3.c">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\CacheManager.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GDBBlock.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GDBEdge.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GDBList.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GraphApplication.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GraphIO.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GraphLoader.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GraphQuery.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GraphUpdater.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\IdAlloter.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\IDPool.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\LPAT.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\RDB.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\RDBHandler.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\TempGraph.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GraphManager.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\definations.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\GraphSetManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\eval.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\GraphDBBaseListener.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\GraphDBBaseVisitor.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\GraphDBLexer.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\GraphDBListener.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\GraphDBParser.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\GraphDBVisitor.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\GraphParser.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="parser\MyGraphVisitor.cpp">
+      <Filter>源文件\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphDatabase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphQueryEngineMemory.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryGraph.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphProcessor.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="tools.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\BPlusTreeUtils.cpp">
+      <Filter>源文件\storage</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphSchema.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphSchemaManager.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

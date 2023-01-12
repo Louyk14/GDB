@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2FCE7C8F-71CB-46AD-B39A-1728386DDB1F}</ProjectGuid>
+    <RootNamespace>GDB</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\louyk\Documents\Visual Studio 2015\Projects\GDB\GDB\antlr4-runtime;C:\Users\louyk\Documents\Visual Studio 2015\Projects\GDB\GDB\subgraphmatching</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\louyk\Documents\Visual Studio 2015\Projects\GDB\GDB\subgraphmatching;$(VC_IncludePath);$(WindowsSDK_IncludePath);C:\Users\louyk\Documents\Visual Studio 2015\Projects\GDB\GDB\antlr4-runtime;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>antlr4-runtime-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="GraphDatabase.h" />
+    <ClInclude Include="GraphProcessor.h" />
+    <ClInclude Include="GraphQueryEngineMemory.h" />
+    <ClInclude Include="GraphSchema.h" />
+    <ClInclude Include="GraphSchemaManager.h" />
+    <ClInclude Include="MemoryGraph.h" />
+    <ClInclude Include="parser\definations.h" />
+    <ClInclude Include="parser\eval.h" />
+    <ClInclude Include="parser\GraphDBBaseListener.h" />
+    <ClInclude Include="parser\GraphDBBaseVisitor.h" />
+    <ClInclude Include="parser\GraphDBLexer.h" />
+    <ClInclude Include="parser\GraphDBListener.h" />
+    <ClInclude Include="parser\GraphDBParser.h" />
+    <ClInclude Include="parser\GraphDBVisitor.h" />
+    <ClInclude Include="parser\graphException.h" />
+    <ClInclude Include="parser\GraphParser.h" />
+    <ClInclude Include="parser\MyGraphVisitor.h" />
+    <ClInclude Include="storage\BigKeyCacheManager.h" />
+    <ClInclude Include="storage\BigKeyIndex.h" />
+    <ClInclude Include="storage\BigKeyNode.h" />
+    <ClInclude Include="storage\BPlusTree.h" />
+    <ClInclude Include="storage\BPlusTreeNode.h" />
+    <ClInclude Include="storage\BPlusTreeUtils.h" />
+    <ClInclude Include="storage\Cache.h" />
+    <ClInclude Include="storage\CacheManager.h" />
+    <ClInclude Include="storage\Clock.h" />
+    <ClInclude Include="storage\GDBBlock.h" />
+    <ClInclude Include="storage\GDBEdge.h" />
+    <ClInclude Include="storage\GDBList.h" />
+    <ClInclude Include="storage\GDBRegion.h" />
+    <ClInclude Include="storage\GraphManager.h" />
+    <ClInclude Include="storage\GraphApplication.h" />
+    <ClInclude Include="storage\GraphIO.h" />
+    <ClInclude Include="storage\GraphLoader.h" />
+    <ClInclude Include="storage\GraphQuery.h" />
+    <ClInclude Include="storage\GraphSetManager.h" />
+    <ClInclude Include="storage\GraphUpdater.h" />
+    <ClInclude Include="storage\IdAlloter.h" />
+    <ClInclude Include="storage\IDPool.h" />
+    <ClInclude Include="storage\IndexCacheManager.h" />
+    <ClInclude Include="storage\LPAT.h" />
+    <ClInclude Include="storage\RDB.h" />
+    <ClInclude Include="storage\RDBHandler.h" />
+    <ClInclude Include="storage\sqlite3.h" />
+    <ClInclude Include="storage\StorageMeta.h" />
+    <ClInclude Include="storage\TempGraph.h" />
+    <ClInclude Include="subgraphmatching\ComputeSetIntersection.h" />
+    <ClInclude Include="subgraphmatching\config.h" />
+    <ClInclude Include="subgraphmatching\DAF.h" />
+    <ClInclude Include="subgraphmatching\daftypes.h" />
+    <ClInclude Include="subgraphmatching\Match.h" />
+    <ClInclude Include="subgraphmatching\nodesorter.h" />
+    <ClInclude Include="subgraphmatching\probability_strategy.h" />
+    <ClInclude Include="subgraphmatching\SuperGraph.h" />
+    <ClInclude Include="subgraphmatching\TurboGraph.h" />
+    <ClInclude Include="subgraphmatching\TurboMatch.h" />
+    <ClInclude Include="subgraphmatching\vf2_state.h" />
+    <ClInclude Include="subgraphmatching\vf2_state_comm.h" />
+    <ClInclude Include="subgraphmatching\vf2_state_sub.h" />
+    <ClInclude Include="subgraphmatching\vf2_state_super.h" />
+    <ClInclude Include="subgraphmatching\vf3_state.h" />
+    <ClInclude Include="subgraphmatching\vf3_state_bound.h" />
+    <ClInclude Include="subgraphmatching\vf3_state_in.h" />
+    <ClInclude Include="subgraphmatching\vf3_state_self.h" />
+    <ClInclude Include="subgraphmatching\vf3_state_super.h" />
+    <ClInclude Include="temporal\CommGraphUtil.h" />
+    <ClInclude Include="temporal\GraphAnalyzer.h" />
+    <ClInclude Include="temporal\GraphGenerator.h" />
+    <ClInclude Include="temporal\TemporalGraph.h" />
+    <ClInclude Include="temporal\TemporalSearch.h" />
+    <ClInclude Include="temporal\TS.h" />
+    <ClInclude Include="tools.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="GraphDatabase.cpp" />
+    <ClCompile Include="GraphProcessor.cpp" />
+    <ClCompile Include="GraphQueryEngineMemory.cpp" />
+    <ClCompile Include="GraphSchema.cpp" />
+    <ClCompile Include="GraphSchemaManager.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="MemoryGraph.cpp" />
+    <ClCompile Include="parser\definations.cpp" />
+    <ClCompile Include="parser\eval.cpp" />
+    <ClCompile Include="parser\GraphDBBaseListener.cpp" />
+    <ClCompile Include="parser\GraphDBBaseVisitor.cpp" />
+    <ClCompile Include="parser\GraphDBLexer.cpp" />
+    <ClCompile Include="parser\GraphDBListener.cpp" />
+    <ClCompile Include="parser\GraphDBParser.cpp" />
+    <ClCompile Include="parser\GraphDBVisitor.cpp" />
+    <ClCompile Include="parser\GraphParser.cpp" />
+    <ClCompile Include="parser\MyGraphVisitor.cpp" />
+    <ClCompile Include="storage\BPlusTreeUtils.cpp" />
+    <ClCompile Include="storage\CacheManager.cpp" />
+    <ClCompile Include="storage\GDBBlock.cpp" />
+    <ClCompile Include="storage\GDBEdge.cpp" />
+    <ClCompile Include="storage\GDBList.cpp" />
+    <ClCompile Include="storage\GraphManager.cpp" />
+    <ClCompile Include="storage\GraphApplication.cpp" />
+    <ClCompile Include="storage\GraphIO.cpp" />
+    <ClCompile Include="storage\GraphLoader.cpp" />
+    <ClCompile Include="storage\GraphQuery.cpp" />
+    <ClCompile Include="storage\GraphSetManager.cpp" />
+    <ClCompile Include="storage\GraphUpdater.cpp" />
+    <ClCompile Include="storage\IdAlloter.cpp" />
+    <ClCompile Include="storage\IDPool.cpp" />
+    <ClCompile Include="storage\LPAT.cpp" />
+    <ClCompile Include="storage\RDB.cpp" />
+    <ClCompile Include="storage\RDBHandler.cpp" />
+    <ClCompile Include="storage\sqlite3.c" />
+    <ClCompile Include="storage\TempGraph.cpp" />
+    <ClCompile Include="subgraphmatching\ComputeSetIntersection.cpp" />
+    <ClCompile Include="subgraphmatching\DAF.cpp" />
+    <ClCompile Include="subgraphmatching\subgraph-matching-main.cpp" />
+    <ClCompile Include="subgraphmatching\Match.cpp" />
+    <ClCompile Include="subgraphmatching\nodesorter.cpp" />
+    <ClCompile Include="subgraphmatching\probability_strategy.cpp" />
+    <ClCompile Include="subgraphmatching\TurboGraph.cpp" />
+    <ClCompile Include="subgraphmatching\TurboMatch.cpp" />
+    <ClCompile Include="subgraphmatching\vf2_state.cpp" />
+    <ClCompile Include="subgraphmatching\vf2_state_comm.cpp" />
+    <ClCompile Include="subgraphmatching\vf2_state_sub.cpp" />
+    <ClCompile Include="subgraphmatching\vf2_state_super.cpp" />
+    <ClCompile Include="subgraphmatching\vf3_state.cpp" />
+    <ClCompile Include="subgraphmatching\vf3_state_bound.cpp" />
+    <ClCompile Include="subgraphmatching\vf3_state_in.cpp" />
+    <ClCompile Include="subgraphmatching\vf3_state_self.cpp" />
+    <ClCompile Include="subgraphmatching\vf3_state_super.cpp" />
+    <ClCompile Include="temporal\CommGraphUtil.cpp" />
+    <ClCompile Include="temporal\GraphAnalyzer.cpp" />
+    <ClCompile Include="temporal\GraphGenerator.cpp" />
+    <ClCompile Include="temporal\TemporalSearch.cpp" />
+    <ClCompile Include="temporal\TS.cpp" />
+    <ClCompile Include="tools.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
