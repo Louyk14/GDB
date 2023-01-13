@@ -94,9 +94,15 @@ void GraphProcessor::exec_remove_stat(RemoveStatement& stat) {
 	if (stat.type == REMOVE_FROM_GSET_TYPE) {
 		gdb->removeFromGraphSet(stat.removeGSetStat->gsid, stat.removeGSetStat->gidlist);
 	}
-	//else (stat.type == REMOVE_FROM_GRAPH_TYPE) {
-	//	gdb->remove
-	//}
+	else if (stat.type == REMOVE_FROM_GRAPH_TYPE) {
+		exec_remove_from_graph_stat(*stat.removeGraphStat);
+	}
+}
+
+void GraphProcessor::exec_remove_from_graph_stat(RemoveGraphStat& stat) {
+	if (stat.type == REMOVE_FROM_GRAPH_TUPLE_TYPE) {
+		gdb->removeFromGraph(*stat.gstat, stat.gid);
+	}
 }
 
 void GraphProcessor::exec_create_schema(CreateSchemaStatement& stat) {

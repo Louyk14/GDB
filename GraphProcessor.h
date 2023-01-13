@@ -20,6 +20,7 @@ public:
 	void exec_insert_stat(InsertStatement& stat);
 	void exec_insert_into_graph_stat(InsertGraphStat& stat);
 	void exec_remove_stat(RemoveStatement& stat);
+	void exec_remove_from_graph_stat(RemoveGraphStat& stat);
 	void exec_create_schema(CreateSchemaStatement& stat);
 
 	void createGraph(string gname);
