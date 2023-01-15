@@ -3,6 +3,7 @@
 #define RDB_H
 
 #include "RDBHandler.h"
+#include "GraphManager.h"
 
 #include "sqlite3.h"
 #include <string>
@@ -10,7 +11,10 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
+
+class GraphManager;
 
 using namespace std;
 
@@ -43,8 +47,15 @@ public:
 	void initNodeTable(string filename, unordered_map<int, int>& nodetypes);
 	void initEdgeTable(string filename);
 
+	void insertIntoNodeTable(string filename, GraphManager* gm);
+	void insertIntoEdgeTable(string filename, GraphManager* gm);
+
+	void createTable(GraphManager* gm);
+
 	void insertNewKey(int type, vector<string>& attributes);
 	void removeKey(int node_id, int type);
+
+	string getType(int code);
 };
 
 #endif

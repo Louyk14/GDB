@@ -54,7 +54,7 @@ GraphManager::GraphManager(string& dbn, int block_list, int list_edge, double av
 	cacheManager->getCache(cacheManager->getBlockMetaCache(), new_smeta, S_META_OFFSET);
 	mGraph = new MemoryGraph();
 	community_nodes_path = base_dir + dbn + "//_communityNodes.db";
-	node_block_path = base_dir + dbn + "//_ nodeBlockMap.db";
+	node_block_path = base_dir + dbn + "//_nodeBlockMap.db";
 	edh_path = base_dir + dbn + "//_edh.db";
 
 	if (!firsttime) {
@@ -182,10 +182,12 @@ void GraphManager::init()
 	gRegion = vector<GDBRegion>(mGraph->communityNum + 1);
 }
 
-void GraphManager::storeAttributes(unordered_map<int, int>& nodetypes)
-{
-	relDB->initNodeTable(db_name + "\\nodeAttributes.dat", nodetypes);
-	relDB->initEdgeTable(db_name + "\\edgeAttributes.dat");
+void GraphManager::storeAttributes(string nodeattributefile, string edgeattributefile) {
+	relDB->createTable(this);
+	relDB->insertIntoNodeTable(nodeattributefile, this);
+	relDB->insertIntoEdgeTable(edgeattributefile, this);
+	// relDB->initNodeTable(db_name + "\\nodeAttributes.dat", nodetypes);
+	// relDB->initEdgeTable(db_name + "\\edgeAttributes.dat");
 }
 
 void GraphManager::setOpened(bool op)
@@ -208,7 +210,7 @@ double GraphManager::store(int limit)
 	gLoader->readCommunity(*mGraph, db_name + "\\community.dat", base_dir + db_name + "\\");
 	gLoader->readGraphFromFile(*mGraph, db_name + "\\network.dat");
 		
-	storeAttributes(mGraph->nodeType);
+	// storeAttributes(mGraph->nodeType);
 
 	init();
 	initialNew();
@@ -258,7 +260,7 @@ double GraphManager::store(int limit)
 	return 0;
 }
 
-double GraphManager::store(string networkfile, string communityfile, int limit)
+double GraphManager::store(string networkfile, string communityfile, string nodeattributefile, string edgeattributefile, int limit)
 {
 	//tempGraph = new GDBDataGraph();
 	//Graph gra;
@@ -268,7 +270,9 @@ double GraphManager::store(string networkfile, string communityfile, int limit)
 	gLoader->readCommunity(*mGraph, communityfile, base_dir + db_name + "\\");
 	gLoader->readNetworkFromFile(*mGraph, networkfile);
 
-	storeAttributes(mGraph->nodeType);
+	if (nodeattributefile.size() != 0 || edgeattributefile.size() != 0) {
+		storeAttributes(nodeattributefile, edgeattributefile);
+	}
 
 	init();
 	initialNew();

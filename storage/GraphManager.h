@@ -45,6 +45,7 @@ class GraphLoader;
 class GraphUpdater;
 class MemoryGraph;
 class GraphSchemaManager;
+class RDB;
 
 class GraphManager {
 public:
@@ -123,11 +124,11 @@ public:
 	void setOpened(bool op);
 
 	double store(int limit=200);
-	double store(string networkfile, string commmunityfile, int limit=200);
+	double store(string networkfile, string commmunityfile, string nodeattributefile = "", string edgeattributefile = "", int limit=200);
 	void connect();
 	void disconnect();
 	
-	void storeAttributes(unordered_map<int, int>& nodetypes);
+	void storeAttributes(string nodeattributefile, string edgeattributefile);
 	void initialNew();
 	void storeGraphGreedy(MemoryGraph& graph, int limit);
 	void storeCommunityGreedyRelation(MemoryGraph& graph, int comid, int limit);

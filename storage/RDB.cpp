@@ -18,13 +18,11 @@ RDB::~RDB() {
 void RDB::connect_sqlite()
 {
 	int rc = sqlite3_open(dbname.c_str(), &db);
-	if (rc)
-	{
+	if (rc) {
 		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
 		//exit(0);
 	}
-	else
-	{
+	else {
 		fprintf(stderr, "Opened database successfully\n");
 	}
 }
@@ -534,4 +532,289 @@ void RDB::removeKey(int node_id, int type)
 	string tablename = nodetype2tablename[type];
 	string deletesql = handler.generateDeleteSQL(tablename, node_id);
 	handler.execute(db, deletesql);
+}
+
+void RDB::insertIntoNodeTable(string filename, GraphManager* gm) {
+	fstream infile;
+	infile.open(filename, ios::in);
+	if (infile.fail()) {
+		cerr << "读取文件错误" << endl;
+		return;
+	}
+
+	char* zErrMsg = 0;
+	int iRet = SQLITE_OK;
+	iRet = sqlite3_exec(db, "BEGIN", NULL, NULL, &zErrMsg);
+	if (iRet != SQLITE_OK) {
+		if (zErrMsg != NULL)
+		{
+			sqlite3_free(zErrMsg);
+		}
+
+		return;
+	}
+
+	string buffer;
+	bool flag = true;
+	while (getline(infile, buffer)) {
+		istringstream iss;
+		iss.str(buffer);
+
+		int nodeId;
+		string label;
+		string sql;
+		if (gm->mGraph->nodeIdAlloterType == 0) {
+			int nid;
+			iss >> nid >> label;
+			nodeId = gm->mGraph->nodeIdAlloter.i2iAlloter->allotId(nid);
+			sql = "INSERT INTO NODE" + label + " values (" + to_string(nodeId) + "," + to_string(nid);
+		}
+		else if (gm->mGraph->nodeIdAlloterType == 1) {
+			string nid;
+			iss >> nid >> label;
+			nid = nid.substr(1, nid.size() - 2);
+			nodeId = gm->mGraph->nodeIdAlloter.s2iAlloter->allotId(nid);
+			sql = "INSERT INTO NODE" + label + " values (" + to_string(nodeId) + "," + nid;
+		}
+
+		string attrval;
+		while (iss >> attrval) {
+			sql = sql + ", " + attrval;
+		}
+
+		sql += ");";
+	
+		char* zErrMsg = 0;
+
+		int rc = handler.execute(db, sql);
+
+		if (rc != SQLITE_OK) {
+			fprintf(stderr, "SQL error: %s\n", zErrMsg);
+			sqlite3_free(zErrMsg);
+			flag = false;
+			break;
+		}
+		else
+		{
+			//fprintf(stdout, "Insert successfully\n");
+		}
+	}
+
+	if (!flag) {
+		sqlite3_exec(db, "rollback", NULL, 0, 0);
+		cout << "fail" << endl;
+	}
+	else
+	{
+		iRet = sqlite3_exec(db, "COMMIT", NULL, NULL, &zErrMsg);
+		if (iRet != SQLITE_OK)
+		{
+			fprintf(stderr, "SQL error: Commit fails\n");
+		}
+
+		if (zErrMsg != NULL)
+		{
+			sqlite3_free(zErrMsg);
+		}
+	}
+
+	infile.close();
+}
+
+void RDB::insertIntoEdgeTable(string filename, GraphManager* gm) {
+	fstream infile;
+	infile.open(filename, ios::in);
+	if (infile.fail()) {
+		cerr << "读取文件错误" << endl;
+		return;
+	}
+
+	char* zErrMsg = 0;
+	int iRet = SQLITE_OK;
+	iRet = sqlite3_exec(db, "BEGIN", NULL, NULL, &zErrMsg);
+	if (iRet != SQLITE_OK) {
+		if (zErrMsg != NULL)
+		{
+			sqlite3_free(zErrMsg);
+		}
+
+		return;
+	}
+
+	string buffer;
+	bool flag = true;
+	while (getline(infile, buffer)) {
+		istringstream iss;
+		iss.str(buffer);
+
+		int nodeId;
+		string label;
+		string sql;
+		
+		string eid;
+		iss >> eid >> label;
+		sql = "INSERT INTO EDGE" + label + " values (" + eid;
+		
+		string attrval;
+		while (iss >> attrval) {
+			sql = sql + ", " + attrval;
+		}
+
+		sql += ");";
+
+		char* zErrMsg = 0;
+
+		int rc = handler.execute(db, sql);
+
+		if (rc != SQLITE_OK) {
+			fprintf(stderr, "SQL error: %s\n", zErrMsg);
+			sqlite3_free(zErrMsg);
+			flag = false;
+			break;
+		}
+		else
+		{
+			//fprintf(stdout, "Insert successfully\n");
+		}
+	}
+
+	if (!flag) {
+		sqlite3_exec(db, "rollback", NULL, 0, 0);
+		cout << "fail" << endl;
+	}
+	else
+	{
+		iRet = sqlite3_exec(db, "COMMIT", NULL, NULL, &zErrMsg);
+		if (iRet != SQLITE_OK)
+		{
+			fprintf(stderr, "SQL error: Commit fails\n");
+		}
+
+		if (zErrMsg != NULL)
+		{
+			sqlite3_free(zErrMsg);
+		}
+	}
+
+	infile.close();
+}
+
+void RDB::createTable(GraphManager* gm) {
+	char* zErrMsg = 0;
+	int iRet = SQLITE_OK;
+	iRet = sqlite3_exec(db, "BEGIN", NULL, NULL, &zErrMsg);
+	if (iRet != SQLITE_OK) {
+		if (zErrMsg != NULL)
+		{
+			sqlite3_free(zErrMsg);
+		}
+
+		return;
+	}
+
+	bool flag = true;
+	for (int i = 0; i < gm->gSchema->nodelabels.size(); ++i) {
+		string label = gm->gSchema->nodelabels[i];
+		string sql = "CREATE TABLE NODE" + label + " (ALLOTID INT,";
+
+		for (int j = 0; j < gm->gSchema->nodelabeltoattr[i + 1].size(); ++j) {
+			if (j != 0)
+				sql += ",";
+			sql = sql + gm->gSchema->nodelabeltoattr[i + 1][j].first + " " + getType(gm->gSchema->nodelabeltoattr[i + 1][j].second);
+		}
+		sql += ");";
+
+		int rc = handler.execute(db, sql);
+		//int rc = sqlite3_exec(db, buff.c_str(), callback, 0, &zErrMsg);
+
+		if (rc != SQLITE_OK) {
+			cout << "Dropping table ... " << endl;
+			string dropsql = "DROP TABLE NODE" + label + ";";
+
+			char* zErrMsg = 0;
+			int rc = handler.execute(db, dropsql);
+			if (rc != SQLITE_OK) {
+				flag = false;
+				break;
+			}
+			rc = handler.execute(db, sql);
+			if (rc != SQLITE_OK) {
+				flag = false;
+				break;
+			}
+			else {
+				fprintf(stdout, "Table created successfully\n");
+			}
+		}
+		else {
+			fprintf(stdout, "Table created successfully\n");
+		}
+	}
+	
+	for (int i = 0; i < gm->gSchema->edgelabels.size(); ++i) {
+		string label = gm->gSchema->edgelabels[i];
+		string sql = "CREATE TABLE EDGE" + label + " (";
+
+		for (int j = 0; j < gm->gSchema->edgelabeltoattr[i + 1].size(); ++j) {
+			if (j != 0)
+				sql += ",";
+			sql = sql + gm->gSchema->edgelabeltoattr[i + 1][j].first + " " + getType(gm->gSchema->edgelabeltoattr[i + 1][j].second);
+		}
+		sql += ");";
+
+		int rc = handler.execute(db, sql);
+		//int rc = sqlite3_exec(db, buff.c_str(), callback, 0, &zErrMsg);
+
+		if (rc != SQLITE_OK) {
+			cout << "Dropping table ... " << endl;
+			string dropsql = "DROP TABLE EDGE" + label + ";";
+
+			char* zErrMsg = 0;
+			int rc = handler.execute(db, dropsql);
+			if (rc != SQLITE_OK) {
+				flag = false;
+				break;
+			}
+			rc = handler.execute(db, sql);
+			if (rc != SQLITE_OK) {
+				flag = false;
+				break;
+			}
+			else {
+				fprintf(stdout, "Table created successfully\n");
+			}
+		}
+		else {
+			fprintf(stdout, "Table created successfully\n");
+		}
+	}
+	
+	if (!flag) {
+		sqlite3_exec(db, "rollback", NULL, 0, 0);
+		cout << "fail" << endl;
+		return;
+	}
+	else {
+		iRet = sqlite3_exec(db, "COMMIT", NULL, NULL, &zErrMsg);
+		if (iRet != SQLITE_OK) {
+			fprintf(stderr, "SQL error: Commit fails\n");
+		}
+
+		if (zErrMsg != NULL) {
+			sqlite3_free(zErrMsg);
+		}
+	}
+}
+
+string RDB::getType(int code) {
+	if (code == 0)
+		return "INT";
+	else if (code == 1)
+		return "CHAR";
+	else if (code == 2)
+		return "VARCHAR";
+	else if (code == 3)
+		return "FLOAT";
+	else if (code == 4)
+		return "DOUBLE";
 }

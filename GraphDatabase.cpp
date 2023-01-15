@@ -119,11 +119,18 @@ void GraphDatabase::createGraph(string gname, vector<string>& filelist, string& 
 	GraphManager* graph = new GraphManager(dbname, block_listnum, list_edgenum, ava_threshold, cachesize,
 		leaf_file, internal_file, leaf_cache_size, internal_cache_size,
 		big_key_file, big_key_cache_size, tree_empty, overwrite, firsttime);
+	
+	graph->setGraphSchema(gschemaManager, schemaid);
 
-	graph->store(filelist[0], filelist[1]);
+	if (filelist.size() == 2) {
+		graph->store(filelist[0], filelist[1]);
+	}
+	else {
+		graph->store(filelist[0], filelist[1], filelist[2], filelist[3]);
+	}
+
 	graph->setStorageMeta();
 	graph->setGraphTime();
-	graph->setGraphSchema(gschemaManager, schemaid);
 
 	graphs[gname] = graph;
 }
