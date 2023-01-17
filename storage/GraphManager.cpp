@@ -186,6 +186,9 @@ void GraphManager::storeAttributes(string nodeattributefile, string edgeattribut
 	relDB->createTable(this);
 	relDB->insertIntoNodeTable(nodeattributefile, this);
 	relDB->insertIntoEdgeTable(edgeattributefile, this);
+
+	//unordered_map<string, unordered_map<string, string>> answer;
+	//relDB->handler.getAttributesById(relDB->db, "NODESTUDENT", vector<string>(1, "1"), vector<string>(), answer);
 	// relDB->initNodeTable(db_name + "\\nodeAttributes.dat", nodetypes);
 	// relDB->initEdgeTable(db_name + "\\edgeAttributes.dat");
 }

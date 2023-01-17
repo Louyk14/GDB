@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <map>
+#include <unordered_map>
 
 using namespace std;
 
@@ -22,6 +24,8 @@ public:
 	int execute(sqlite3* &db, string& sql);
 	string generateInsertSQL(string table, vector<string>& attributes, vector<string>& defaultVal);
 	string generateDeleteSQL(string table, int node_id);
+
+	void getAttributesById(sqlite3* &db, string table, vector<string>& edge_str, vector<string>& attr, unordered_map<string, unordered_map<string, string>>& answer);
 };
 
 #endif
