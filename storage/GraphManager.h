@@ -98,8 +98,10 @@ public:
 	void loadMemoryGraph(int type); //type 0: from disk, type 1: from file
 	void loadMemoryGraphFromDisk();
 	void loadMemoryGraphFromFile();
+	void printMemoryGraphFromDisk(string& str);
 	void addBlockToGraph(GDBBlock* block);
 	void addBlockToGraph(GDBBlock* block, unordered_set<int>& nodeset);
+	void printBlockToString(GDBBlock* block, string& str);
 
 	bool doBetweenness;
 

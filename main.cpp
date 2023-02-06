@@ -5,6 +5,7 @@
 #include "parser\GraphParser.h"
 #include "storage\GraphManager.h"
 #include "GraphDatabase.h"
+#include"server/GDBServer.h"
 //#include "JsonUtil.h"
 
 using std::cerr;
@@ -17,13 +18,21 @@ using std::ofstream;
 //#pragma comment(lib, "antlr4-runtime.lib")
 
 int main(int argc, char** argv) {
-	GraphDatabase* gdb = new GraphDatabase();
+	GDBServer* server = new GDBServer();
+	server->StartDatabase();
+	server->RunGreeterServer();
+	server->StopDatabase();
+
+	delete server;
+	return 0;
+
+	/*GraphDatabase* gdb = new GraphDatabase();
 	
 	gdb->run();
 
 	gdb->close();
 	delete gdb;
-	return 0;
+	return 0;*/
 	//string data = "dataset/subgraphmatching/data/1000/network.dat";//string(argv[1]);
 	//string tempdata = "dataset/temporal/college/network.txt";
 	//string pattern = "dataset/subgraphmatching/pattern/p3.dat";//string(argv[2]);

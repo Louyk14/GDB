@@ -849,6 +849,27 @@ void GraphManager::loadMemoryGraphFromDisk() {
 	gLoader->initAfterReadNetwork(*mGraph, "");
 }
 
+void GraphManager::printMemoryGraphFromDisk(string& str) {
+	GraphIO* blockIO = cacheManager->getBlockCache().getIO();
+	GDBBlock* block = new GDBBlock(block_listnum, list_edgenum);
+	vector<int> params;
+	params.push_back(block_listnum);
+	params.push_back(list_edgenum);
+
+	unordered_set<int> nodeset;
+
+	int startoff = begin_of_block;
+	while (true) {
+		blockIO->mapping(block, startoff, params);
+		printBlockToString(block, str);
+
+		startoff += block_size;
+		blockIO->file.seekg(startoff);
+		if (blockIO->file.peek() == -1)
+			break;
+	}
+}
+
 void GraphManager::addBlockToGraph(GDBBlock* block) {
 	int listnum = block->b_meta.ava_listnum;
 	for (int i = 0; i < listnum; ++i) {
@@ -859,6 +880,21 @@ void GraphManager::addBlockToGraph(GDBBlock* block) {
 			int type = block->lists[i].edge[j].type;
 			
 			mGraph->addEdge(node1, node2, type);
+		}
+	}
+}
+
+void GraphManager::printBlockToString(GDBBlock* block, string& str) {
+	int listnum = block->b_meta.ava_listnum;
+	for (int i = 0; i < listnum; ++i) {
+		int node1 = block->lists[i].l_meta.nodeid;
+		int edgenum = block->lists[i].l_meta.edge_num;
+		str += (to_string(node1) + " " + to_string(edgenum) + " ");
+		for (int j = 0; j < edgenum; ++j) {
+			int node2 = block->lists[i].edge[j].dest_id;
+			int type = block->lists[i].edge[j].type;
+
+			str += (to_string(node2) + " " + to_string(type) + " ");
 		}
 	}
 }
