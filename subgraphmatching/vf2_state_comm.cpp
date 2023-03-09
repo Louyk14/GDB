@@ -131,7 +131,7 @@ bool VF2StateComm::CompareNodeAttribute(MemoryGraph* data, int n1, int n2)
 {
 	return true;
 	string n2_str = to_string(n2);
-	int n1type = atoi((*g1->nodeAttributes)[n1]["TYPE"].c_str());
+	int n1type = atoi(g1->nodeAttributes[n1]["TYPE"].c_str());
 	int n2type = data->nodeInfo[n2][1];
 
 	if (n1type != n2type)
@@ -142,7 +142,7 @@ bool VF2StateComm::CompareNodeAttribute(MemoryGraph* data, int n1, int n2)
 	map<string, map<string, string>> answer;
 	//storage.attr.getNodeAllAttributesBatch(storage.db, vector<string>(1, n2_str), vector<string>(1, storage.nodetype2tablename[n2type]), answer);
 
-	for (const auto& a : (*g1->nodeAttributes)[n1])
+	for (const auto& a : g1->nodeAttributes[n1])
 	{
 		if (a.first == "TYPE")
 		{
@@ -168,7 +168,7 @@ bool VF2StateComm::CompareNodeAttribute(MemoryGraph* data, int n1, int n2)
 bool VF2StateComm::CompareEdgeAttribute(MemoryGraph* data, int src1, int dst1, int src2, int dst2)
 {
 	return true;
-	int type1 = atoi((*g1->edgeAttributes)[src1][dst1]["TYPE"].c_str());
+	int type1 = atoi(g1->edgeAttributes[src1][dst1]["TYPE"].c_str());
 	unordered_set<int> type2;// = storage.GetEdgeType(src2, dst2);
 
 	if (type2.find(type1) == type2.end())
@@ -181,7 +181,7 @@ bool VF2StateComm::CompareEdgeAttribute(MemoryGraph* data, int src1, int dst1, i
 	map<string, map<string, string>> answer;
 	//storage.attr.getEdgeAttributes(storage.db, storage.edgetype2tablename[type1], vector<string>(1, estr), vector<string>(), answer);
 
-	for (const auto& e : (*g1->edgeAttributes)[src1][dst1])
+	for (const auto& e : g1->edgeAttributes[src1][dst1])
 	{
 		if (e.first == "TYPE")
 		{

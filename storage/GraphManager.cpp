@@ -56,14 +56,21 @@ GraphManager::GraphManager(string& dbn, int block_list, int list_edge, double av
 	community_nodes_path = base_dir + dbn + "//_communityNodes.db";
 	node_block_path = base_dir + dbn + "//_nodeBlockMap.db";
 	edh_path = base_dir + dbn + "//_edh.db";
+	node_label_path = base_dir + dbn + "//_nodeLabels.db";
+	temporal_info_path = base_dir + dbn + "//temporal.info";
 
 	if (!firsttime) {
 		graph_create_time = string(new_smeta->data->createtime);
 		schemaid = string(new_smeta->data->schemaid);
 		mGraph->setInfo(new_smeta->data->nodenum, new_smeta->data->commnum, new_smeta->data->idtype, new_smeta->data->commtype, base_dir + db_name + "\\", new_smeta->data->iddefault, new_smeta->data->commdefault);
+		
+		if (new_smeta->data->istemporal == 1)
+			mGraph->istemporal = true;
+
 		gLoader->loadCommunityNodes(*mGraph, community_nodes_path);
 		gLoader->loadNodeBlocks(*mGraph, node_block_path);
 		gLoader->loadEdgeDestHead(*mGraph, edh_path);
+		gLoader->loadNodeLabels(*mGraph, node_label_path);
 	}
 
 	setOpened(false);
@@ -154,6 +161,11 @@ GraphManager::~GraphManager()
 	gLoader->writeCommunityNodes(*mGraph, community_nodes_path);
 	gLoader->writeNodeBlocks(*mGraph, node_block_path);
 	gLoader->writeEdgeDestHead(*mGraph, edh_path);
+	gLoader->writeNodeLabels(*mGraph, node_label_path);
+
+	if (mGraph->loadtemporal) {
+		gLoader->writeTemporalInfo(*mGraph, temporal_info_path);
+	}
 	
 	if (mGraph)
 		delete mGraph;
@@ -213,6 +225,11 @@ double GraphManager::store(int limit)
 	gLoader->readCommunity(*mGraph, db_name + "\\community.dat", base_dir + db_name + "\\");
 	gLoader->readGraphFromFile(*mGraph, db_name + "\\network.dat");
 		
+	if (mGraph->istemporal) {
+		mGraph->temporal_info.clear();
+		gLoader->writeTemporalInfo(*mGraph, base_dir + db_name + "\\temporal.info");
+	}
+	
 	// storeAttributes(mGraph->nodeType);
 
 	init();
@@ -351,6 +368,11 @@ void GraphManager::connect()
 	node_block_path = db_name + "_" + "nodeBlock.db";
 	gLoader->loadNodeBlocks(*mGraph, node_block_path);
 
+	node_label_path = db_name + "_" + "nodeLabel.db";
+	gLoader->loadNodeLabels(*mGraph, node_label_path);
+
+	temporal_info_path = db_name + "_" + "temporal.info";
+
 	setOpened(true);
 }
 
@@ -398,7 +420,7 @@ void GraphManager::storeGraphGreedy(MemoryGraph& graph, int limit)
 	int existCommunity = 1;
 	int communityNum = graph.getCommunityNum();
 
-	while (existCommunity < communityNum)
+	while (existCommunity <= communityNum)
 	{
 		storeCommunityGreedyRelation(graph, existCommunity, limit);
 		existCommunity++;
@@ -793,12 +815,16 @@ void GraphManager::setEdgeDestHead(int destid, EdgePos* ep)
 }
 
 void GraphManager::setInMemory() {
-	mGraph = new MemoryGraph();
+	// mGraph = new MemoryGraph();
 	loadMemoryGraphFromDisk();
+	getAllAttributes(mGraph->nodeAttributes);
+	inMemory = true;
 }
 
 void GraphManager::releaseInMemory() {
-	delete mGraph;
+	// delete mGraph;
+	
+	inMemory = false;
 }
 
 void GraphManager::loadMemoryGraph(int type) {
@@ -821,6 +847,10 @@ void GraphManager::loadMemoryGraphFromFile() {
 	gLoader->readGraphFromFile(*mGraph, networkfile, labelfile);
 }
 
+void GraphManager::releaseMemoryGraph() {
+	mGraph->releaseNetwork();
+}
+
 void GraphManager::loadMemoryGraphFromDisk() {
 	mGraph->initNetwork(new_smeta->data->nodenum);
 
@@ -839,6 +869,7 @@ void GraphManager::loadMemoryGraphFromDisk() {
 
 		startoff += block_size;
 		blockIO->file.seekg(startoff);
+
 		if (blockIO->file.peek() == -1)
 			break;
 	}
@@ -899,6 +930,21 @@ void GraphManager::printBlockToString(GDBBlock* block, string& str) {
 	}
 }
 
+void GraphManager::getAllAttributes(unordered_map<int, unordered_map<string, string>>& answer) {
+	unordered_map<string, vector<string>> ids;
+	for (const auto& node : mGraph->nodes) {
+		int ilabel = mGraph->nodeLabels[node] - 1;
+		if (ilabel < 0)
+			continue;
+		string tablename = "NODE" + gSchema->nodelabels[ilabel];
+		ids[tablename].push_back(to_string(node));
+	}
+
+	for (auto& idlist : ids) {
+		relDB->handler.getAttributesById(relDB->db, idlist.first, idlist.second, vector<string>(), answer);
+	}
+}
+
 void GraphManager::addBlockToGraph(GDBBlock* block, unordered_set<int>& nodeset) {
 	int listnum = block->b_meta.ava_listnum;
 	for (int i = 0; i < listnum; ++i) {
@@ -930,6 +976,11 @@ void GraphManager::setStorageMeta() {
 
 	new_smeta->data->idtype = mGraph->nodeIdAlloterType;
 	new_smeta->data->commtype = mGraph->communityIdAlloterType;
+
+	if (mGraph->istemporal)
+		new_smeta->data->istemporal = 1;
+	else
+		new_smeta->data->istemporal = 0;
 
 	if (mGraph->nodeIdAlloterType == 0) {
 		_itoa(mGraph->nodeIdAlloter.i2iAlloter->defaultval, new_smeta->data->iddefault, 10);
@@ -968,6 +1019,7 @@ void GraphManager::setGraphSchema(GraphSchemaManager* gsm, string& schema) {
 		schemaid = schema;
 		gSchema = gsm->schemas[schema];
 		strcpy(new_smeta->data->schemaid, schemaid.c_str());
+		mGraph->labelnum = gSchema->nodelabels.size() + 1;
 	}
 	else {
 		cout << "Schema not found" << endl;

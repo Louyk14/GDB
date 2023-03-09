@@ -23,7 +23,7 @@ public:
 	void createSchema(string schemaname, unordered_map<string, vector<pair<string, string>>>& nodeAttrMap, unordered_map<string, vector<pair<string, string>>>& edgeAttrMap, unordered_map<string, vector<pair<string, string>>>& schemaNetwork);
 	void createSchema(string filename);
 	void dropSchema(string& schemaname);
-	void dispatchSchema(string& schemaname, GraphSchema*& gschema, int type); // 0: graph, 1: graph set
+	void dispatchSchema(string& gname, string& schemaname, GraphSchema*& gschema, int type); // 0: graph, 1: graph set
 
 	bool hasSchema(string& schemaname);
 };

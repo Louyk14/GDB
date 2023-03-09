@@ -8,10 +8,10 @@ static bool cmpD(const DegreePos& a, const DegreePos& b)
     return a.degree < b.degree;
 }
 
-DAF::DAF(MemoryGraph* data_graph, MemoryGraph* query_graph) {
+DAF::DAF(MemoryGraph* data_graph, MemoryGraph* query_graph, MemoryGraph* d) {
     g = data_graph;
     q = query_graph;
-    data = data_graph;
+    data = d;
 
     itercount = 0;
 
@@ -3050,8 +3050,7 @@ size_t DAF::startMatch_comm() {
     //    generateDPisoFilterPlan(g, q, dpiso_tree, dpiso_order);
     //}
 
-    generateDSPisoQueryPlan(q, matching_order, pivots, dpiso_tree, dpiso_order,
-                                                    candidates_count);
+    generateDSPisoQueryPlan(q, matching_order, pivots, dpiso_tree, dpiso_order, candidates_count);
 
     size_t ansnum = exploreDPisoStyleSuper(g, q, dpiso_tree, candidates, candidates_count, dpiso_order);
 
@@ -3254,7 +3253,7 @@ void DAF::pruneCandidatesSuper(const MemoryGraph *data_graph, const MemoryGraph 
         ui v = candidates[query_vertex][i];
         if (v == INVALID_VERTEX_ID)
             continue;
-
+		
         if (flag[v] != count) {
             candidates[query_vertex][i] = INVALID_VERTEX_ID;
         }
@@ -3774,8 +3773,7 @@ size_t DAF::exploreDPisoStyleSuper(const MemoryGraph *data_graph, const MemoryGr
                                 newM[i] = j;
                             }
                         }
-                    }
-                    
+                    }                    
                     commnum = index;
                     rematch_DAF(supert, supermapper, newM, embedding, *communityGraphs, *q);
                     
@@ -4254,7 +4252,7 @@ void DAF::rematch_DAF(int** supermatch, int* c2cmapper, int* supermatchmap, int*
         }
         return;//continue;
     }
-    
+	
     //int id = omp_get_thread_num();
     //vector<map<int, int>> newallmaps;
     bool smallestPattern = false;
@@ -4334,63 +4332,103 @@ void DAF::rematch_DAF(int** supermatch, int* c2cmapper, int* supermatchmap, int*
                             {
                                 count++;
 
-                                int label = 0;// l.first;
+                                int label = this->q->nodeLabels[n];// l.first;
                                 p.degree = n2cNum[n][actualc];//l.second;
                                 p.pos = -1;
 
-                                vector<DegreePos>* dpSaver = &data->degreePosOut[actualcomm][actualc][label];
-                                if (dpSaver->empty())
-                                {
-                                    canfind = false;
-                                    break;
-                                }
+								if (label == 0) {
+									bool getit = false;
+									for (int tlabel = 0; tlabel < data->degreePosOut[actualcomm][actualc].size(); ++tlabel) {
+										vector<DegreePos>* dpSaver = &data->degreePosOut[actualcomm][actualc][tlabel];
+										if (dpSaver->empty())
+										{
+											continue;
+										}
 
-                                vector<DegreePos>::iterator sit = lower_bound(dpSaver->begin(), dpSaver->end(), p, cmpD);
-                                if (sit == dpSaver->end())
-                                {
-                                    canfind = false;
-                                    break;
-                                }
-                                else
-                                {
-                                    bool test = true;
-                                    vector<int>& cobSaver = data->commOutBoundary[actualcomm][actualc][label];
-                                    for (ui x = sit->pos; x < cobSaver.size(); ++x) {
-                                        VertexID v = cobSaver[x];
-                                        if (flag_comm[v] == count) {
-                                            if (flag_comm[v] == 0)
-                                                updated_flag[updated_flag_count++] = v;
-                                            flag_comm[v]++;
-                                            test = false;
-                                        }
-                                    }
-                                    if (test) {
-                                        canfind = false;
-                                        break;
-                                    }
-                                    /*if (narea == NULL)
-                                    {
-                                        
-                                        //narea = new vector<int>(cobSaver->begin() + sit->pos, cobSaver->end());
-                                        //sort(narea->begin(), narea->end());
-                                        //pointers.push_back(narea);
-                                    }
-                                    else
-                                    {
-                                        //vector<int> t;
-                                        vector<int> tempvector(cobSaver->begin() + sit->pos, cobSaver->end());
-                                        sort(tempvector.begin(), tempvector.end());
-                                        vector<int>::iterator it = set_intersection(narea->begin(), narea->end(), tempvector.begin(), tempvector.end(), narea->begin());
-                                        narea->resize(it - narea->begin());
-                                        if (narea->empty())
-                                        {
-                                            //if (index <= 2)
-                                            canfind = false;
-                                            break;
-                                        }
-                                        //*narea = t;
-                                    }*/
-                                }
+										vector<DegreePos>::iterator sit = lower_bound(dpSaver->begin(), dpSaver->end(), p, cmpD);
+										if (sit == dpSaver->end())
+										{
+											continue;
+										}
+										else
+										{
+											bool test = true;
+											vector<int>& cobSaver = data->commOutBoundary[actualcomm][actualc][tlabel];
+											for (ui x = sit->pos; x < cobSaver.size(); ++x) {
+												VertexID v = cobSaver[x];
+												if (flag_comm[v] == count) {
+													if (flag_comm[v] == 0)
+														updated_flag[updated_flag_count++] = v;
+													flag_comm[v]++;
+													test = false;
+													getit = true;
+												}
+											}
+											if (test) {
+												continue;
+											}
+										}
+									}
+									if (!getit) {
+										canfind = false;
+										break;
+									}
+								}
+								else {
+									vector<DegreePos>* dpSaver = &data->degreePosOut[actualcomm][actualc][label];
+									if (dpSaver->empty())
+									{
+										canfind = false;
+										break;
+									}
+
+									vector<DegreePos>::iterator sit = lower_bound(dpSaver->begin(), dpSaver->end(), p, cmpD);
+									if (sit == dpSaver->end())
+									{
+										canfind = false;
+										break;
+									}
+									else
+									{
+										bool test = true;
+										vector<int>& cobSaver = data->commOutBoundary[actualcomm][actualc][label];
+										for (ui x = sit->pos; x < cobSaver.size(); ++x) {
+											VertexID v = cobSaver[x];
+											if (flag_comm[v] == count) {
+												if (flag_comm[v] == 0)
+													updated_flag[updated_flag_count++] = v;
+												flag_comm[v]++;
+												test = false;
+											}
+										}
+										if (test) {
+											canfind = false;
+											break;
+										}
+										/*if (narea == NULL)
+										{
+
+											//narea = new vector<int>(cobSaver->begin() + sit->pos, cobSaver->end());
+											//sort(narea->begin(), narea->end());
+											//pointers.push_back(narea);
+										}
+										else
+										{
+											//vector<int> t;
+											vector<int> tempvector(cobSaver->begin() + sit->pos, cobSaver->end());
+											sort(tempvector.begin(), tempvector.end());
+											vector<int>::iterator it = set_intersection(narea->begin(), narea->end(), tempvector.begin(), tempvector.end(), narea->begin());
+											narea->resize(it - narea->begin());
+											if (narea->empty())
+											{
+												//if (index <= 2)
+												canfind = false;
+												break;
+											}
+											//*narea = t;
+										}*/
+									}
+								}
                             }
                         }
                     }
@@ -4623,6 +4661,7 @@ void DAF::rematch_DAF(int** supermatch, int* c2cmapper, int* supermatchmap, int*
     {
         //#pragma omp critical
         {
+			//cout << count * allmaps.size() << " ";
             gm->ansnum += count * allmaps.size();
         }
         /*for (int f = 0; f < finds.size(); f++)
@@ -4808,13 +4847,12 @@ size_t DAF::startMatchDense() {
     return ansnum;
 }
 
-bool DAF::DPisoFilterDense(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
+bool DAF::DPisoFilterDense(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
                             ui *&order, TreeNode *&tree) {
     if (!LDFFilterDense(data_graph, query_graph, candidates, candidates_count))
         return false;
     
     //generateDPisoFilterPlan(data_graph, query_graph, tree, order);
-
     ui query_vertices_num = query_graph->nodeNum;
     
     //std::fill(flag, flag + data_graph->nodenum + 1, 0);
@@ -4846,7 +4884,7 @@ bool DAF::DPisoFilterDense(const MemoryGraph *data_graph, const MemoryGraph *que
     //return isCandidateSetValid(candidates, candidates_count, query_graph->nodenum);
 }
 
-bool DAF::LDFFilterDense(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count) {
+bool DAF::LDFFilterDense(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count) {
     //allocateBuffer_comm(data_graph, query_graph, candidates, candidates_count);
 
     for (ui i = 1; i <= query_graph->nodeNum; ++i) {
@@ -4866,6 +4904,15 @@ bool DAF::LDFFilterDense(const MemoryGraph *data_graph, const MemoryGraph *query
         for (ui j = 0; j < data_graph->nodeNum; ++j) {
             ui data_vertex = data_graph->nodes[j];
             if (data_graph->degrees[data_vertex] >= degree) {
+				if (query_graph->nodeAttributes[i].size() > data_graph->nodeAttributes[data_vertex].size())
+					continue;
+				if (query_graph->nodeLabels[i] != 0 && query_graph->nodeLabels[i] != data_graph->nodeLabels[data_vertex])
+					continue;
+				for (const auto& attrpair : query_graph->nodeAttributes[i]) {
+					if (data_graph->nodeAttributes[data_vertex].find(attrpair.first) == data_graph->nodeAttributes[data_vertex].end()
+						|| attrpair.second != data_graph->nodeAttributes[data_vertex][attrpair.first])
+						continue;
+				}
 				//candmap[i][data_vertex] = candidates_count[i];
                 candidates[i][candidates_count[i]++] = data_vertex;
             }
@@ -5122,7 +5169,7 @@ size_t DAF::startMatchBound() {
     return ansnum;
 }
 
-bool DAF::LDFFilterBound(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count) {
+bool DAF::LDFFilterBound(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count) {
     //allocateBuffer_comm(data_graph, query_graph, candidates, candidates_count);
 
     //eset.clear();
@@ -5159,6 +5206,15 @@ bool DAF::LDFFilterBound(const MemoryGraph *data_graph, const MemoryGraph *query
                 if (g->degrees[data_vertex] >= degree) {
                     //int ccount = candidates_count[i];
 					//candmap[i][data_vertex] = candidates_count[i];
+					if (query_graph->nodeAttributes[i].size() > data_graph->nodeAttributes[data_vertex].size())
+						continue;
+					if (query_graph->nodeLabels[i] != 0 && query_graph->nodeLabels[i] != data_graph->nodeLabels[data_vertex])
+						continue;
+					for (const auto& attrpair : query_graph->nodeAttributes[i]) {
+						if (data_graph->nodeAttributes[data_vertex].find(attrpair.first) == data_graph->nodeAttributes[data_vertex].end()
+							|| attrpair.second != data_graph->nodeAttributes[data_vertex][attrpair.first])
+							continue;
+					}
                     candidates[i][candidates_count[i]++] = data_vertex;
                     /*for (unordered_set<int>::iterator setinter = leftset.begin(); setinter != leftset.end();) {
                         int index = *setinter;
@@ -5215,6 +5271,15 @@ bool DAF::LDFFilterBound(const MemoryGraph *data_graph, const MemoryGraph *query
                 if (g->degrees[data_vertex] >= degree) {
                     //int ccount = candidates_count[i];
 					//candmap[i][data_vertex] = candidates_count[i];
+					if (query_graph->nodeAttributes[i].size() > data_graph->nodeAttributes[data_vertex].size())
+						continue;
+					if (query_graph->nodeLabels[i] != 0 && query_graph->nodeLabels[i] != data_graph->nodeLabels[data_vertex])
+						continue;
+					for (const auto& attrpair : query_graph->nodeAttributes[i]) {
+						if (data_graph->nodeAttributes[data_vertex].find(attrpair.first) == data_graph->nodeAttributes[data_vertex].end()
+							|| attrpair.second != data_graph->nodeAttributes[data_vertex][attrpair.first])
+							continue;
+					}
                     candidates[i][candidates_count[i]++] = data_vertex;
                     /*for (unordered_set<int>::iterator setinter = leftset.begin(); setinter != leftset.end();) {
                         int index = *setinter;
@@ -5259,7 +5324,7 @@ bool DAF::LDFFilterBound(const MemoryGraph *data_graph, const MemoryGraph *query
     return true;
 }
 
-bool DAF::DPisoFilterBound(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
+bool DAF::DPisoFilterBound(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
                             ui *&order, TreeNode *&tree) {
     if (!LDFFilterBound(data_graph, query_graph, candidates, candidates_count))
         return false;

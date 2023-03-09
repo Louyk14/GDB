@@ -2,6 +2,8 @@
 #ifndef GRAPHSETMANAGER_H
 #define GRAPHSETMANAGER_H
 
+#include "../ParserGraphs.h"
+#include "../GraphQueryEngineMemory.h"
 #include "GraphIO.h"
 #include "../GraphDatabase.h"
 #include <vector>
@@ -12,6 +14,7 @@ using namespace std;
 
 class GraphDatabase;
 class GraphManager;
+class WhereConditionGraph;
 
 class GraphSetManager {
 public:
@@ -21,6 +24,7 @@ public:
 	unordered_map<string, string> gManagers;
 	unordered_map<string, int> graphAuth;
 	GraphIO* gIO;
+	GraphQueryEngineMemory* gqem;
 
 	GraphSetManager(string name, GraphDatabase* db);
 	GraphSetManager(string name, GraphDatabase* db, vector<string>& aliasg);
@@ -30,6 +34,7 @@ public:
 	bool registerGraph(string gname, string gtime, int auth = 0); // 0 - read only, 1 - read or write
 	bool returnGraph(string gname, int auth=0);
 	void removeGraph(string gname);
+	void query(WhereConditionGraph* wcg);
 
 	bool login();
 	bool logout();

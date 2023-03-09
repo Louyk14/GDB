@@ -1,5 +1,60 @@
 #include "Match.h"
 
+Match::Match(GraphManager* gmanager, MemoryGraph* p) {
+	gm = gmanager;
+	pattern = p;
+
+	if (!gm->inMemory)
+		gm->setInMemory();
+	data = gm->mGraph;
+	analyzeNetwork(data);
+
+	constructCommunityGraph();
+
+	share1NeighbourPairs = vector<vector<bool>>(data->communityNum + 1, vector<bool>(data->communityNum + 1, false));
+	share2NeighbourPairs = vector<vector<vector<bool>>>(data->communityNum + 1, vector<vector<bool>>(data->communityNum + 1, vector<bool>(data->communityNum + 1, false)));
+
+	for (int i = 1; i < data->netWorkSet.size(); ++i)
+	{
+		int n1 = i;
+		set<int> rec;
+		unordered_map<int, int> record_comm;
+		// int comm1 = data->nodeInfo[n1][0];
+		int comm1 = *data->nodeCommunitySet[n1].begin();
+		for (const auto& n2 : data->netWorkSet[n1])
+		{
+			// int comm2 = data->nodeInfo[n2.first][0];
+			int comm2 = *data->nodeCommunitySet[n2.first].begin();
+			rec.insert(comm2);
+			if (record_comm.find(comm2) == record_comm.end())
+				record_comm[comm2] = 1;
+			else
+				record_comm[comm2]++;
+			share1NeighbourPairs[comm1][comm2] = true;
+		}
+		vector<int> recv = vector<int>(rec.begin(), rec.end());
+		for (int p = 0; p < recv.size(); ++p)
+		{
+			for (int q = 0; q < recv.size(); ++q)
+			{
+				if (recv[p] == recv[q] && record_comm[recv[p]] == 1)
+					continue;
+				share2NeighbourPairs[comm1][recv[p]][recv[q]] = true;
+			}
+		}
+	}
+	cout << "finish share" << endl;
+	ansnum = 0;
+	internum = 0;
+	matchType = 1;
+
+	usefulCS = 0;
+	uselessCS = 0;
+	uselessDouble = 0;
+	uselessUntrivial = 0;
+	uselessCut2 = 0;
+}
+
 Match::Match(string datafile, string communityfile, string patternfile)
 {
 	samecounter = 0;
@@ -181,143 +236,66 @@ void Match::loadPatternGraph(string filename, vector<int>& nodes
 	fstream infile(filename);
 	string buff = "";
 
-	getline(infile, buff);
-	int nodenum = atoi(buff.c_str());
+	int nodenum, edgenum, type;
+	infile >> nodenum >> edgenum >> type;
 	nodeLabels->resize(nodenum + 1);
 	outedges.resize(nodenum + 1);
 	inedges.resize(nodenum + 1);
+	nodeAttributes.clear();
+	edgeAttributes.clear();
 
-	for (int i = 0; i < nodenum; i++)
-	{
-		buff.clear();
-
-		string s = "";
-		getline(infile, buff);
-		buff += " ";
-
-		bool isFirst = false;
-		int node_id;
-		bool isAttrName = true;
-		string attriname = "";
-
-		for (int j = 0; j < buff.size(); j++)
-		{
-			if (buff[j] == ' ')
-			{
-				if (s.empty())
-				{
-					continue;
-				}
-
-				if (!isFirst)
-				{
-					isFirst = true;
-					node_id = atoi(s.c_str());
-					nodes.push_back(node_id);
-					(*nodeLabels)[node_id] = 0;
-					s.clear();
-					continue;
-				}
-
-				//nodeLabels[node_id] = atoi(s.c_str());
-
-				/*if (isAttrName)
-				{
-					attriname = s;
-					isAttrName = false;
-				}
-				else
-				{
-					nodeAttributes[node_id][attriname] = s;
-					isAttrName = true;
-				}*/
-
-				s.clear();
-			}
-			else
-			{
-				s += buff[j];
+	for (int i = 1; i <= nodenum; ++i) {
+		int nodeid, attrnum;
+		string nlabel;
+		infile >> nodeid >> nlabel >> attrnum;
+		int actual = gm->gSchema->nodenamemap[nlabel];
+		(*nodeLabels)[nodeid] = actual;
+		if (attrnum != 0) {
+			for (int j = 0; j < attrnum; ++j) {
+				string attrname;
+				string attrval;
+				nodeAttributes[nodeid][attrname] = attrval;
 			}
 		}
 	}
 
-	buff.clear();
-	getline(infile, buff);
-	int edgenum = atoi(buff.c_str());
+	if (type == 0) {
+		for (int i = 0; i < edgenum; ++i) {
+			int src, dst, eattrnum;
+			string elabel;
+			infile >> src >> dst >> elabel >> eattrnum;
+			int actual = gm->gSchema->edgenamemap[elabel];
+			outedges[src][dst].push_back(actual);
+			outedges[dst][src].push_back(actual);
 
-	for (int i = 0; i < edgenum; i++)
-	{
-		buff.clear();
-
-		string s = "";
-		getline(infile, buff);
-		buff += " ";
-
-		int j = 0;
-		int src, dst;
-		for (; j < buff.size(); j++)
-		{
-			if (buff[j] == ' ')
-			{
-				src = atoi(s.c_str());
-				break;
-			}
-			else
-			{
-				s += buff[j];
+			if (eattrnum != 0) {
+				for (int j = 0; j < eattrnum; ++j) {
+					string attrname;
+					string attrval;
+					infile >> attrname >> attrval;
+					edgeAttributes[src][dst][attrname] = attrval;
+					edgeAttributes[dst][src][attrname] = attrval;
+				}
 			}
 		}
+	}
+	else {
+		for (int i = 0; i < edgenum; ++i) {
+			int src, dst, eattrnum;
+			string elabel;
+			infile >> src >> dst >> elabel >> eattrnum;
+			int actual = gm->gSchema->edgenamemap[elabel];
+			outedges[src][dst].push_back(actual);
 
-		s.clear();
-
-		for (j++; j < buff.size(); j++)
-		{
-			if (buff[j] == ' ')
-			{
-				dst = atoi(s.c_str());
-				break;
-			}
-			else
-			{
-				s += buff[j];
+			if (eattrnum != 0) {
+				for (int j = 0; j < eattrnum; ++j) {
+					string attrname;
+					string attrval;
+					infile >> attrname >> attrval;
+					edgeAttributes[src][dst][attrname] = attrval;
+				}
 			}
 		}
-
-		s.clear();
-
-		bool isAttrName = true;
-		string attriname = "";
-
-		for (; j < buff.size(); j++)
-		{
-			if (buff[j] == ' ')
-			{
-				if (s.empty())
-				{
-					continue;
-				}
-
-				if (isAttrName)
-				{
-					attriname = s;
-					isAttrName = false;
-				}
-				else
-				{
-					edgeAttributes[src][dst][attriname] = s;
-					isAttrName = true;
-				}
-
-				s.clear();
-			}
-			else
-			{
-				s += buff[j];
-			}
-		}
-
-		outedges[src][dst].push_back(0);// atoi(edgeAttributes[src][dst]["TYPE"].c_str());
-		inedges[dst][src].push_back(0);// atoi(edgeAttributes[src][dst]["TYPE"].c_str());
 	}
 }
 
@@ -356,9 +334,11 @@ void Match::analyzeNetwork(MemoryGraph* g) {
 
 	for (const auto& nodeId1 : g->nodes) {
 		for (const auto& nodeId2 : g->netWorkSet[nodeId1]) {
-			int c2 = g->nodeInfo[nodeId2.first][0];
+			// int c2 = g->nodeInfo[nodeId2.first][0];
+			int c2 = *g->nodeCommunitySet[nodeId2.first].begin();
 			g->commNetworkSet[nodeId1][c2][g->nodeLabels[nodeId2.first]].insert(nodeId2.first);
-			int c1 = g->nodeInfo[nodeId1][0];
+			// int c1 = g->nodeInfo[nodeId1][0];
+			int c1 = *g->nodeCommunitySet[nodeId1].begin();
 			g->commTotalNumTag[c1][c2]++;
 
 			if (g->commOuts[c1][c2].find(nodeId1) != g->commOuts[c1][c2].end())
@@ -487,13 +467,16 @@ void Match::analyzeNetwork(MemoryGraph* g) {
 	//return;
 	for (const auto& n : g->nodes)
 	{
-		int comm_n = g->nodeInfo[n][0];
+		// int comm_n = g->nodeInfo[n][0];
+		int comm_n = *g->nodeCommunitySet[n].begin();
 		for (const auto& neigh1 : g->netWorkSet[n])
 		{
-			int comm_id = g->nodeInfo[neigh1.first][0];
+			// int comm_id = g->nodeInfo[neigh1.first][0];
+			int comm_id = *g->nodeCommunitySet[neigh1.first].begin();
 			for (const auto& neigh2 : g->netWorkSet[neigh1.first])
 			{
-				int comm_id2 = g->nodeInfo[neigh2.first][0];
+				// int comm_id2 = g->nodeInfo[neigh2.first][0];
+				int comm_id2 = *g->nodeCommunitySet[neigh2.first].begin();
 				if (g->netWorkSet[n].find(neigh2.first) != g->netWorkSet[n].end())
 				{
 					g->triangleLimitation[comm_n][comm_id][comm_id2] = true;
@@ -521,14 +504,17 @@ void Match::constructCommunityGraph() {
 	}
 	communityGraphsVec = vector<MemoryGraph*>(commIds.size() + 1, NULL);
 
+	data->maxCommSize = 0;
 	for (int i = 0; i < commIds.size(); i++)
 	{
 		//unordered_map<int, unordered_set<int>> interouts, interins;
 
 		if (data->communityNodes[commIds[i]].size() > 1)
-		{
+		{			
 			commoe[commIds[i]][commIds[i]].push_back(0);
 		}
+
+		data->maxCommSize = max(data->maxCommSize, (int)data->communityNodes[commIds[i]].size());
 
 		vector<int> cnodes(1, -1);
 		unordered_set<int> cnodeset;
@@ -545,16 +531,19 @@ void Match::constructCommunityGraph() {
 			idToNew[n] = index++;
 		}
 		vector<unordered_map<int, vector<int>>>* edges = new vector<unordered_map<int, vector<int>>>(index);
+		vector<int> cnodeLabels(index, 0);
 		index = 1;
 		for (const auto& n : data->communityNodes[commIds[i]])
 		{
 			newnodes.push_back(index++);
+			cnodeLabels[idToNew[n]] = data->nodeLabels[n];
 			//cnodes.push_back(n);
 			//commna[c.first]["TYPE"].insert(to_string(storage.GetNodeType(to_string(n).c_str())));
 
 			for (const auto& neigh : data->netWorkSet[n])
 			{
-				if (data->nodeInfo[neigh.first][0] == commIds[i])
+				// if (data->nodeInfo[neigh.first][0] == commIds[i])
+				if (*data->nodeCommunitySet[neigh.first].begin() == commIds[i])
 				{
 					int newNeigh = idToNew[neigh.first];
 					int newN = idToNew[n];
@@ -562,8 +551,11 @@ void Match::constructCommunityGraph() {
 					(*edges)[newN][newNeigh].push_back(0);
 				}
 
-				int c1 = data->nodeInfo[n][0];
-				int c2 = data->nodeInfo[neigh.first][0];
+				//int c1 = data->nodeInfo[n][0];
+				//int c2 = data->nodeInfo[neigh.first][0];
+
+				int c1 = *data->nodeCommunitySet[n].begin();
+				int c2 = *data->nodeCommunitySet[neigh.first].begin();
 
 				commoe[c1][c2].push_back(0);
 				commie[c2][c1].push_back(1);
@@ -571,7 +563,7 @@ void Match::constructCommunityGraph() {
 		}
 
 		//sort(cnodes.begin(), cnodes.end());
-		MemoryGraph* t = new MemoryGraph(newnodes, NULL, NULL, edges, edges, data->labelnum, &data->nodeLabels);
+		MemoryGraph* t = new MemoryGraph(newnodes, NULL, NULL, edges, edges, data->labelnum, &cnodeLabels);
 		//t->nodeset = new unordered_set<int>(newnodes.begin(), newnodes.end());
 		t->idMapping = cnodes;
 		//t->getedgemap();
@@ -607,12 +599,10 @@ void Match::initCompleteMatchNodes()
 		completeMatchPatternNodes[initvec[n]].insert(initvec[n]);
 	}
 
-	for (int i = 0; i < pattern->nodes.size(); i++)
-	{
+	for (int i = 0; i < pattern->nodes.size(); i++) {
 		int pid = pattern->nodes[i];
 
-		for (int j = i + 1; j < pattern->nodes.size(); j++)
-		{
+		for (int j = i + 1; j < pattern->nodes.size(); j++) {
 			int pid2 = pattern->nodes[j];
 			if (completeMatchPatternNodes[initvec[pid]] == completeMatchPatternNodes[initvec[pid2]])
 				continue;
@@ -620,14 +610,15 @@ void Match::initCompleteMatchNodes()
 			if (matchType == 0)
 			{
 				if ((*pattern->outedges)[pid].size() != (*pattern->outedges)[pid2].size()
-					|| (*pattern->inedges)[pid].size() != (*pattern->inedges)[pid2].size())
-				{
+					|| (*pattern->inedges)[pid].size() != (*pattern->inedges)[pid2].size()
+					|| pattern->nodeLabels[pid] != pattern->nodeLabels[pid2])				{
 					continue;
 				}
 			}
 			else if (matchType == 1)
 			{
-				if ((*pattern->outedges)[pid].size() != (*pattern->outedges)[pid2].size())
+				if ((*pattern->outedges)[pid].size() != (*pattern->outedges)[pid2].size()
+					|| pattern->nodeLabels[pid] != pattern->nodeLabels[pid2])
 				{
 					continue;
 				}
@@ -646,6 +637,22 @@ void Match::initCompleteMatchNodes()
 
 			if (!ok)
 			{
+				continue;
+			}
+
+			if (pattern->nodeAttributes[pid].size() != pattern->nodeAttributes[pid2].size()) {
+				continue;
+			}
+
+			for (const auto& attrpair : pattern->nodeAttributes[pid]) {
+				if (pattern->nodeAttributes[pid2].find(attrpair.first) != pattern->nodeAttributes[pid2].end()
+					|| attrpair.second != pattern->nodeAttributes[pid2][attrpair.first]) {
+					ok = false;
+					break;
+				}
+			}
+
+			if (!ok) {
 				continue;
 			}
 
@@ -676,8 +683,7 @@ void Match::initCompleteMatchNodes()
 	}
 
 	int classNumber = 0;
-	for (const auto& n : pattern->nodes)
-	{
+	for (const auto& n : pattern->nodes) {
 		if (patternEqualClass.find(n) != patternEqualClass.end())
 		{
 			continue;
@@ -700,7 +706,8 @@ void Match::initCompleteMatchNodes()
 	{
 		for (const auto& m : pattern->nodes)
 		{
-			if (completeMatchPatternNodes[initvec[n]].find(initvec[m]) == completeMatchPatternNodes[initvec[n]].end())
+			if (completeMatchPatternNodes[initvec[n]].find(initvec[m]) == completeMatchPatternNodes[initvec[n]].end()
+				&& pattern->nodeLabels[n] == pattern->nodeLabels[m])
 			{
 				int count = 0;
 				vector<vector<int>*> boundary(pattern->nodeNum + 1, NULL);
@@ -1308,7 +1315,7 @@ int Match::GoMatch_DAF_comm()
 	TurboMatch tempm;
 	vector<vector<int>> NECV;
 	vector<int> qnodes = pattern->nodes;
-	tempm.FindNEC(&NECV, &qnodes, pattern);
+	tempm.FindNECSelf(&NECV, &qnodes, pattern);
 	//#pragma omp parallel for schedule(dynamic) if(ISPARALLEL)
 	for (int i = 0; i < NECV.size(); i++)
 	{
@@ -1332,7 +1339,7 @@ int Match::GoMatch_DAF_comm()
 	hittimes = 0;
 	int c = 0;
 
-	DAF daf(&commGraph, pattern);
+	DAF daf(&commGraph, pattern, data);
 	daf.gm = this;
 	daf.equalq = &equalq;
 	daf.communityGraphs = &communityGraphsVec;
@@ -1364,7 +1371,7 @@ int Match::GoMatch_DAF()
 	//MemoryGraph* data_graph = new MemoryGraph(data->nodes, NULL, NULL, &(data->netWorkSet), &(data->netWorkSet), data->labelnum, &data->nodeLabels);
 	//data_graph->getedgemap();
 
-	DAF daf(data, pattern);
+	DAF daf(data, pattern, data);
 	daf.gm = this;
 	daf.candmap = new int*[pattern->nodeNum + 1];
 	for (int i = 1; i < pattern->nodeNum + 1; ++i) {

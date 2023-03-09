@@ -92,7 +92,7 @@ compareStat: compareUnit | compareStat calculateOperator compareStat | bracketLe
 compareUnit: value | attributeName;
 compareValStat: compareStat compareOperator compareStat;
 funcStat: funcName '(' objectList ')' | funcName '(' ')';
-funcName: K_equal | K_vertex | K_edge | K_complete | K_unique | K_hasedge | K_sizegeq | K_graphequal | K_graphinset | K_subgraph | K_inducedsub | K_connect | K_clique | K_tdensesub;
+funcName: K_equal | K_vertex | K_edge | K_complete | K_unique | K_hasedge | K_sizegeq | K_graphequal | K_graphinset | K_subgraph | K_inducedsub | K_connect | K_clique | K_tdensesub | K_track;
 object: paraItem | paraItem '[' indexInt ']';
 objectList: object ',' objectList | object;
 varList: variableName | variableName ',' varList;
@@ -193,6 +193,7 @@ K_inducedsub: I N D U C E D S U B;
 K_connect: C O N N E C T;
 K_clique: C L I Q U E;
 K_tdensesub: T D E N S E S U B;
+K_track: T R A C K;
 K_create: C R E A T E;
 K_int: I N T;
 K_integer: I N T E G E R;

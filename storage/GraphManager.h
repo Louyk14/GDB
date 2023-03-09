@@ -98,10 +98,13 @@ public:
 	void loadMemoryGraph(int type); //type 0: from disk, type 1: from file
 	void loadMemoryGraphFromDisk();
 	void loadMemoryGraphFromFile();
+	void releaseMemoryGraph();
 	void printMemoryGraphFromDisk(string& str);
 	void addBlockToGraph(GDBBlock* block);
 	void addBlockToGraph(GDBBlock* block, unordered_set<int>& nodeset);
 	void printBlockToString(GDBBlock* block, string& str);
+
+	void getAllAttributes(unordered_map<int, unordered_map<string, string>>& answer);
 
 	bool doBetweenness;
 
@@ -112,6 +115,8 @@ public:
 	string community_nodes_path;
 	string node_block_path;
 	string edh_path;
+	string node_label_path;
+	string temporal_info_path;
 	bool opened;
 
 	GraphManager();

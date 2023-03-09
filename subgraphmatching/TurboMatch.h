@@ -127,6 +127,7 @@ public:
 	bool equals(vector<LabelVList> *v1, vector<LabelVList> *v2);
 	int ChooseStartQVertex(MemoryGraph* q, MemoryGraph* g);
 	void FindNEC(vector<vector<Vid>> *NECV, vector <Vid> *vertexList, MemoryGraph *q);
+	void FindNECSelf(vector<vector<Vid>> *NECV, vector <Vid> *vertexList, MemoryGraph *q);
 	void RewriteToNECTree(MemoryGraph *q, int U_s, NECTree *q_prime);
 	void BuildNECTree(MemoryGraph *q, int U_s, NECTree *q_prime);
 	void ClearCR(Vid uc_Dprime, Vid v_prime, CRTree *CR);

@@ -99,8 +99,8 @@ VF2StateSub::~VF2StateSub()
 bool VF2StateSub::CompareNodeAttribute(int n1, int n2)
 {
 	return true;
-	string n1type = (*g1->nodeAttributes)[n1]["TYPE"];
-	string n2type = (*g2->nodeAttributes)[n2]["TYPE"];
+	string n1type = g1->nodeAttributes[n1]["TYPE"];
+	string n2type = g2->nodeAttributes[n2]["TYPE"];
 
 	if (n1type != n2type)
 	{
@@ -134,8 +134,8 @@ bool VF2StateSub::CompareNodeAttribute(int n1, int n2)
 bool VF2StateSub::CompareEdgeAttribute(int src1, int dst1, int src2, int dst2)
 {
 	return true;
-	string type1 = (*g1->edgeAttributes)[src1][dst1]["TYPE"];
-	string type2 = (*g2->edgeAttributes)[src2][dst2]["TYPE"];
+	string type1 = g1->edgeAttributes[src1][dst1]["TYPE"];
+	string type2 = g2->edgeAttributes[src2][dst2]["TYPE"];
 
 	if (type1 != type2)
 	{

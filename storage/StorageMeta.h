@@ -12,6 +12,7 @@ public:
 	int commnum;
 	int idtype;
 	int commtype;
+	int istemporal;
 	char iddefault[256];
 	char commdefault[256];
 	char schemaid[256];
@@ -34,6 +35,7 @@ public:
 		db_file.read((char*)&commnum, sizeof(int));
 		db_file.read((char*)&idtype, sizeof(int));
 		db_file.read((char*)&commtype, sizeof(int));
+		db_file.read((char*)&istemporal, sizeof(int));
 		db_file.read((char*)(iddefault), sizeof(char) * 256);
 		db_file.read((char*)(commdefault), sizeof(char) * 256);
 		db_file.read((char*)(schemaid), sizeof(char) * 256);
@@ -48,6 +50,7 @@ public:
 		db_file.write((char*)(&commnum), sizeof(int));
 		db_file.write((char*)(&idtype), sizeof(int));
 		db_file.write((char*)(&commtype), sizeof(int));
+		db_file.write((char*)&istemporal, sizeof(int));
 		db_file.write((char*)(iddefault), sizeof(char) * 256);
 		db_file.write((char*)(commdefault), sizeof(char) * 256);
 		db_file.write((char*)(schemaid), sizeof(char) * 256);

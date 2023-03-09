@@ -16,6 +16,9 @@
 
 using namespace std;
 
+class TemporalGraph;
+class TemporalEdgeInfo;
+
 class DNode {
 public:
 	vector<int> nodes;
@@ -97,7 +100,7 @@ public:
 	void tsearch_reduce(TemporalGraph& g, int qv, double phi, int num, int t_s, int t_e);
 	double analyze(TemporalGraph& g, vector<int>& nodes, int t_s, int t_e);
 	double analyzeCase(TemporalGraph& g, vector<int>& nodes);
-	void timeSeries(TemporalGraph& g, vector<int> nodes, int starttime, int dur, int endtime, string outputfile);
+	void timeSeries(TemporalGraph& g, vector<int> nodes, int starttime, int dur, int endtime);
 	void tsearch_enum(TemporalGraph& g, int qv, double phi, int num, int t_s, int t_e);
 	void tsearch(TemporalGraph& g, int qv, double phi, int num, int t_s, int t_e);
 	void tsearch_dfs(TemporalGraph& g, int qv, double phi, int num, int t_s, int t_e);

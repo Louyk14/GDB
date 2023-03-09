@@ -36,6 +36,12 @@ public:
 	void loadEdgeDestHead(MemoryGraph& graph, string& edh_path);
 	void writeEdgeDestHead(MemoryGraph& graph, string& edh_path);
 
+	void loadNodeLabels(MemoryGraph& graph, string& node_label_path);
+	void writeNodeLabels(MemoryGraph& graph, string& node_label_path);
+
+	void loadTemporalInfo(MemoryGraph& graph, string& temporal_info_path);
+	void writeTemporalInfo(MemoryGraph& graph, string& temporal_info_path);
+
 	// Load Into TempGraph
 	void loadNetworkReg(GraphManager& g, TempGraph& graph, string filename);
 };

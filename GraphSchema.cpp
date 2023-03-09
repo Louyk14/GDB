@@ -38,8 +38,7 @@ GraphSchema::GraphSchema(string file, string schemaname, unordered_map<string, v
 	edgelabelnum = edgeAttrMap.size();
 
 	network = vector<unordered_map<int, vector<int>>>(nodenum + 1);
-	unordered_map<string, int> nodenamemap;
-	unordered_map<string, int> edgenamemap;
+	nodenamemap["ANY"] = 0;
 
 	int index = 0;
 	for (auto& nl : nodeAttrMap) {

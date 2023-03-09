@@ -121,6 +121,7 @@ void GraphDatabase::createGraph(string gname, vector<string>& filelist, string& 
 		big_key_file, big_key_cache_size, tree_empty, overwrite, firsttime);
 	
 	graph->setGraphSchema(gschemaManager, schemaid);
+	// gschemaManager->dispatchSchema(dbname, schemaid, graph->gSchema, 0);
 
 	if (filelist.size() == 2) {
 		graph->store(filelist[0], filelist[1]);
@@ -158,7 +159,7 @@ void GraphDatabase::loadGraph(string gname) {
 		leaf_file, internal_file, leaf_cache_size, internal_cache_size,
 		big_key_file, big_key_cache_size, tree_empty, overwrite, firsttime);
 
-	// graph->setGraphSchema(gschemaManager, graph->schemaid);
+	graph->setGraphSchema(gschemaManager, graph->schemaid);
 	
 	graphs[gname] = graph;
 }
@@ -435,5 +436,16 @@ void GraphDatabase::removeFromGraph(GraphStat& gs, string& gid) {
 	if (getGraph(gid, gm)) {
 		TempGraph removeGraph(gs, gm);
 		gm->gUpdater->deleteData(*gm, removeGraph.netWorkSet);
+	}
+}
+
+void GraphDatabase::selectFromGraphSet(FromConditionGraph* fcg, WhereConditionGraph* wcg) {
+	if (fcg->type == 0) {
+		GraphSetManager* gsm;
+		if (!getGraphSet(fcg->gsid, gsm)) {
+			return;
+		}
+
+		gsm->query(wcg);
 	}
 }

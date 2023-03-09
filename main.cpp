@@ -20,19 +20,19 @@ using std::ofstream;
 int main(int argc, char** argv) {
 	GDBServer* server = new GDBServer();
 	server->StartDatabase();
-	server->RunGreeterServer();
+	//server->RunGreeterServer();
 	server->StopDatabase();
 
 	delete server;
 	return 0;
 
-	/*GraphDatabase* gdb = new GraphDatabase();
+	GraphDatabase* gdb = new GraphDatabase();
 	
 	gdb->run();
 
 	gdb->close();
 	delete gdb;
-	return 0;*/
+	return 0;
 	//string data = "dataset/subgraphmatching/data/1000/network.dat";//string(argv[1]);
 	//string tempdata = "dataset/temporal/college/network.txt";
 	//string pattern = "dataset/subgraphmatching/pattern/p3.dat";//string(argv[2]);

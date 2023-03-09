@@ -960,6 +960,195 @@ void TurboMatch::FindNEC(vector<vector<Vid>> *NECV, vector<Vid> *vertexList, Mem
 	}
 }
 
+void TurboMatch::FindNECSelf(vector<vector<Vid>> *NECV, vector<Vid> *vertexList, MemoryGraph *q)
+{
+	sort(vertexList->begin(), vertexList->end());
+	int Size = vertexList->size();
+	if (Size == 1)
+	{
+		(*NECV).push_back(*vertexList);
+	}
+	else
+	{
+		int *p = new int[Size];
+		p[0] = 0;
+		for (int i = 1; i < Size; i++)
+		{
+			int flag = i;
+			for (int j = 0; j < i; j++)
+			{
+				if ((*q->outedges)[(*vertexList)[i]] == (*q->outedges)[(*vertexList)[j]])
+					//&& (*q->inedges)[(*vertexList)[i]] == (*q->inedges)[(*vertexList)[j]])
+				{
+					if (q->nodeAttributes[(*vertexList)[i]].size() != q->nodeAttributes[(*vertexList)[j]].size())
+						continue;
+					if (q->nodeLabels[(*vertexList)[i]] != q->nodeLabels[(*vertexList)[j]])
+						continue;
+					bool ok = true;
+					for (const auto& attrpair : q->nodeAttributes[(*vertexList)[i]]) {
+						if (q->nodeAttributes[(*vertexList)[j]].find(attrpair.first) == q->nodeAttributes[(*vertexList)[j]].end()
+							|| attrpair.first != q->nodeAttributes[(*vertexList)[j]][attrpair.first]) {
+							ok = false;
+							break;
+						}
+					}
+					if (!ok)
+						continue;
+
+					if (nodeArea != NULL)
+					{
+						if (((*nodeArea)[(*vertexList)[i]] == NULL && (*nodeArea)[(*vertexList)[j]] == NULL
+							&& distributeplan[(*vertexList)[i]] == distributeplan[(*vertexList)[j]])
+							|| ((*nodeArea)[(*vertexList)[i]] == ((*nodeArea)[(*vertexList)[j]])))
+						{
+							flag = j;
+							break;
+						}
+					}
+					else
+					{
+						flag = j;
+						break;
+					}
+				}
+			}
+			p[i] = p[flag];
+			p[flag] = i;
+		}
+		for (int i = 0; i < Size; i++)
+		{
+			if (p[i] > i)
+			{
+				vector<Vid> vlist;
+				vlist.push_back((*vertexList)[i]);
+				int Pos = p[i];
+				while (Pos != i)
+				{
+					vlist.push_back((*vertexList)[Pos]);
+					Pos = p[Pos];
+				}
+				(*NECV).push_back(vlist);
+			}
+		}
+		for (int i = 0, j = 0; i < Size; i++)
+		{
+			if (p[i] != i)
+			{
+				vector <Vid>::iterator Iter = vertexList->begin() + j;
+				(*vertexList).erase(Iter);
+			}
+			else
+			{
+				j++;
+			}
+		}
+		if (p != NULL)
+			delete[]p;
+		Size = vertexList->size();
+		if (Size == 1)
+		{
+			(*NECV).push_back(*vertexList);
+		}
+		else if (Size == 0)
+		{
+			//bug fixed
+		}
+		else
+		{
+			for (int i = 0; i < vertexList->size(); )
+			{
+				vector<Vid> a;
+				vector<int> b;
+				int Vi = (*vertexList)[i];
+				a.push_back(Vi);
+				b.push_back(i);
+				int label = q->nodeLabels[Vi];
+
+				if ((*q->labelEdgesVec)[Vi][label] == NULL)
+					//if ((*q->outedges)[Vi].empty())// || (*q->inedges)[Vi].empty())
+				{
+					(*NECV).push_back(a);
+					vector <Vid>::iterator Iter = vertexList->begin() + i;
+					(*vertexList).erase(Iter);
+				}
+				else
+				{
+					for (int j = i + 1; j < vertexList->size(); j++)
+					{
+						Vid Vj = (*vertexList)[j];
+
+						if ((*q->labelEdgesVec)[Vj][label] == NULL)
+							continue;
+						if (q->nodeAttributes[(*vertexList)[i]].size() != q->nodeAttributes[(*vertexList)[j]].size())
+							continue;
+						if (q->nodeLabels[(*vertexList)[i]] != q->nodeLabels[(*vertexList)[j]])
+							continue;
+						bool ok = true;
+						for (const auto& attrpair : q->nodeAttributes[(*vertexList)[i]]) {
+							if (q->nodeAttributes[(*vertexList)[j]].find(attrpair.first) == q->nodeAttributes[(*vertexList)[j]].end()
+								|| attrpair.first != q->nodeAttributes[(*vertexList)[j]][attrpair.first]) {
+								ok = false;
+								break;
+							}
+						}
+						if (!ok)
+							continue;
+						if (nodeArea != NULL)
+						{
+							if (!(((*nodeArea)[(*vertexList)[i]] == NULL && (*nodeArea)[(*vertexList)[j]] == NULL
+								&& distributeplan[(*vertexList)[i]] == distributeplan[(*vertexList)[j]])
+								|| ((*nodeArea)[(*vertexList)[i]] == ((*nodeArea)[(*vertexList)[j]]))))
+							{
+								continue;
+							}
+						}
+
+						int sizea = a.size();
+						bool fmm = true;
+						for (int mm = 0; mm < sizea; mm++)
+						{
+							if ((*q->outedges)[a[mm]].size() != (*q->outedges)[Vj].size() ||
+								(*q->outedges)[Vj].find(a[mm]) == (*q->outedges)[Vj].end())
+								//int posmm = contain(a[mm], &(q->edgeList[Vj][pos3].vList));
+								//if (posmm == -1)
+							{
+								fmm = false;
+								break;
+							}
+							//unordered_set<int> us;
+							for (const auto& n : (*q->outedges)[Vj])
+							{
+								if (n.first == a[mm])
+									continue;
+								if ((*q->outedges)[a[mm]].find(n.first) == (*q->outedges)[a[mm]].end())
+								{
+									fmm = false;
+									break;
+								}
+							}
+							if (!fmm)
+								break;
+						}
+						if (fmm)
+						{
+							a.push_back(Vj);
+							b.push_back(j);
+						}
+					}
+					(*NECV).push_back(a);
+					int sizea = a.size();
+					for (int nn = sizea - 1; nn >= 0; nn--)
+					{
+						vector <Vid>::iterator Iter = vertexList->begin() + b[nn];
+						(*vertexList).erase(Iter);
+					}
+				}
+			}
+		}
+	}
+}
+
+
 void TurboMatch::RewriteToNECTree(MemoryGraph *q, int U_s, NECTree *q_prime)
 {
 	int numVertex = q->nodeNum;// getVertexNum();

@@ -2,6 +2,7 @@
 #ifndef GRAPHDATABASE_H
 #define GRAPHDATABASE_H
 
+#include "ParserGraphs.h"
 #include "parser\GraphParser.h"
 #include "storage\GraphSetManager.h"
 #include "storage\GraphManager.h"
@@ -19,6 +20,8 @@ using namespace std;
 class GraphSetManager;
 class GraphProcessor;
 class GraphLoader;
+class FromConditionGraph;
+class WhereConditionGraph;
 
 class GraphDatabase {
 public:
@@ -59,6 +62,8 @@ public:
 
 	void insertIntoGraph(GraphStat& gs, string& gid);
 	void removeFromGraph(GraphStat& gs, string& gid);
+
+	void selectFromGraphSet(FromConditionGraph* fcg, WhereConditionGraph* wcg);
 
 	GraphParser* gParser;
 	GraphProcessor* gProcessor;

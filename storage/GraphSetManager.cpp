@@ -92,6 +92,73 @@ void GraphSetManager::removeGraph(string gname) {
 	}
 }
 
+void GraphSetManager::query(WhereConditionGraph* wcg) {
+	if (wcg->querytype == "subgraph") {
+		GraphManager* gm;
+
+		bool first = true;
+		for (const auto& gname : gManagers) {
+			gm = getGraph(gname.first);
+			if (first) {
+				wcg->convert(*gm->gSchema);
+				first = false;
+			}
+
+			gqem->subgraphMatchingQuery(gm, wcg->mGraph, DAFTYPE);
+		}
+	}
+	else if (wcg->querytype == "tdensesub") {
+		GraphManager* gm;
+
+		stringstream ss;
+
+		for (const auto& gname : gManagers) {
+			gm = getGraph(gname.first);
+			
+			int qv;
+			if (gm->mGraph->nodeIdAlloterType == 0) {
+				ss << wcg->paras[1];
+				int nodeid;
+				ss >> nodeid;
+				ss.clear();
+				qv = gm->mGraph->nodeIdAlloter.i2iAlloter->allotId(nodeid);
+			}
+			else {
+				qv = gm->mGraph->nodeIdAlloter.s2iAlloter->allotId(wcg->paras[1]);
+			}
+
+			gqem->comboSearching(gm, wcg->related_file, qv);
+			//gqem->comboSearching(gm, ComboParameters(), qv)
+		}
+	}
+	else if (wcg->querytype == "track") {
+		GraphManager* gm;
+
+		stringstream ss;
+
+		for (const auto& gname : gManagers) {
+			gm = getGraph(gname.first);
+
+			vector<int> qvs;
+			for (int i = 1; i < wcg->paras.size(); ++i) {
+				if (gm->mGraph->nodeIdAlloterType == 0) {
+					ss << wcg->paras[i];
+					int nodeid;
+					ss >> nodeid;
+					ss.clear();
+					qvs.push_back(gm->mGraph->nodeIdAlloter.i2iAlloter->allotId(nodeid));
+				}
+				else {
+					qvs.push_back(gm->mGraph->nodeIdAlloter.s2iAlloter->allotId(wcg->paras[i]));
+				}
+			}
+
+			gqem->evolutionTracking(gm, wcg->related_file, qvs);
+			//gqem->comboSearching(gm, ComboParameters(), qv)
+		}
+	}
+}
+
 bool GraphSetManager::login() {
 	gdb->addGraphSet(this);
 	return true;

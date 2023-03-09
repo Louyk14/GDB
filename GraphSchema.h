@@ -23,6 +23,8 @@ public:
 	int edgelabelnum;
 	vector<string> nodelabels; // 10 chars at most
 	vector<string> edgelabels;
+	unordered_map<string, int> nodenamemap;
+	unordered_map<string, int> edgenamemap;
 	vector<unordered_map<int, vector<int>>> network;
 	unordered_map<int, vector<pair<string, int>>> nodelabeltoattr;
 	unordered_map<int, vector<pair<string, int>>> edgelabeltoattr;
@@ -73,8 +75,8 @@ public:
 		db_file >> name;
 		db_file >> nodenum >> edgenum >> edgelabelnum;
 		network = vector<unordered_map<int, vector<int>>>(nodenum + 1);
-		unordered_map<string, int> nodenamemap;
-		unordered_map<string, int> edgenamemap;
+		// unordered_map<string, int> nodenamemap;
+		// unordered_map<string, int> edgenamemap;
 		string tmp;
 		int attrnum;
 		string attrname;

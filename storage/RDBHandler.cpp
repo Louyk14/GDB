@@ -93,6 +93,39 @@ void RDBHandler::getAttributesById(sqlite3* &db, string table, vector<string>& i
 		execute(db, sql);
 	}
 
-	answer = attributes;
+	for (const auto& att : attributes) {
+		answer[att.first] = att.second;
+	}
+	// answer = attributes;
+}
+
+void RDBHandler::getAttributesById(sqlite3* &db, string table, vector<string>& ids, vector<string>& attr, unordered_map<int, unordered_map<string, string>>& answer) {
+	attributes.clear();
+
+	string sql;
+	string select;
+
+	if (!attr.empty()) {
+		for (int i = 0; i < attr.size() - 1; i++) {
+			select += attr[i];
+			select += ", ";
+		}
+
+		select += attr[attr.size() - 1];
+	}
+	else {
+		select = "*";
+	}
+
+	for (int i = 0; i < ids.size(); i++) {
+		curid = ids[i];
+		sql = "SELECT " + select + " from " + table + " where id = '" + ids[i] + "';";
+		execute(db, sql);
+	}
+
+	for (const auto& att : attributes) {
+		answer[atoi(att.first.c_str())] = att.second;
+	}
+	// answer = attributes;
 }
 

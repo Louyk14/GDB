@@ -4,14 +4,19 @@
 
 #include "parser/definations.h"
 #include "GraphDatabase.h"
+#include "ParserGraphs.h"
 
 class GraphDatabase;
+class WhereConditionGraph;
+class FromConditionGraph;
 
 class GraphProcessor {
 public:
 	GraphProcessor(GraphDatabase* db);
 
 	GraphDatabase* gdb;
+	WhereConditionGraph* wcg;
+	FromConditionGraph* fcg;
 
 	void exec(Statement& stat);
 	void exec_ddl(DDLStatement& stat);
@@ -25,6 +30,12 @@ public:
 
 	void createGraph(string gname);
 	void createGraphSet(Statement& stat);
+
+	void exec_query_stat(QueryStatement& stat);
+	void exec_select_stat(SelectStatement& stat);
+
+	void deal_with_first_order_stat(FirstOrderStat& stat);
+	void deal_with_first_order_unit(FirstOrderUnit& stat);
 };
 
 #endif

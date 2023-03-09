@@ -568,6 +568,8 @@ void RDB::insertIntoNodeTable(string filename, GraphManager* gm) {
 			iss >> nid >> label;
 			nodeId = gm->mGraph->nodeIdAlloter.i2iAlloter->allotId(nid);
 			sql = "INSERT INTO NODE" + label + " values (" + to_string(nodeId) + "," + to_string(nid);
+			int ilabel = gm->gSchema->nodenamemap[label];
+			gm->mGraph->nodeLabels[nodeId] = ilabel;
 		}
 		else if (gm->mGraph->nodeIdAlloterType == 1) {
 			string nid;
@@ -575,6 +577,8 @@ void RDB::insertIntoNodeTable(string filename, GraphManager* gm) {
 			nid = nid.substr(1, nid.size() - 2);
 			nodeId = gm->mGraph->nodeIdAlloter.s2iAlloter->allotId(nid);
 			sql = "INSERT INTO NODE" + label + " values (" + to_string(nodeId) + "," + nid;
+			int ilabel = gm->gSchema->nodenamemap[label];
+			gm->mGraph->nodeLabels[nodeId] = ilabel;
 		}
 
 		string attrval;

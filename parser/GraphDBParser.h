@@ -24,10 +24,10 @@ public:
     K_not = 55, K_exist = 56, K_foreach = 57, K_equal = 58, K_complete = 59, 
     K_hasedge = 60, K_graphequal = 61, K_unique = 62, K_sizegeq = 63, K_graphinset = 64, 
     K_subgraph = 65, K_inducedsub = 66, K_connect = 67, K_clique = 68, K_tdensesub = 69, 
-    K_create = 70, K_int = 71, K_integer = 72, K_float = 73, K_double = 74, 
-    K_char = 75, K_string = 76, K_true = 77, K_false = 78, K_file = 79, 
-    K_load = 80, INTEGER_NUMBER = 81, NOT_INTEGER_NUMBER = 82, NAME_STRING = 83, 
-    LETTER = 84, SYMBOL = 85, CHAR = 86, TEXT = 87
+    K_track = 70, K_create = 71, K_int = 72, K_integer = 73, K_float = 74, 
+    K_double = 75, K_char = 76, K_string = 77, K_true = 78, K_false = 79, 
+    K_file = 80, K_load = 81, INTEGER_NUMBER = 82, NOT_INTEGER_NUMBER = 83, 
+    NAME_STRING = 84, LETTER = 85, SYMBOL = 86, CHAR = 87, TEXT = 88
   };
 
   enum {
@@ -1417,6 +1417,7 @@ public:
     antlr4::tree::TerminalNode *K_connect();
     antlr4::tree::TerminalNode *K_clique();
     antlr4::tree::TerminalNode *K_tdensesub();
+    antlr4::tree::TerminalNode *K_track();
 
     virtual void enterRule(antlr4::tree::ParseTreeListener *listener) override;
     virtual void exitRule(antlr4::tree::ParseTreeListener *listener) override;

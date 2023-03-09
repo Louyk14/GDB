@@ -1,6 +1,7 @@
 #ifndef TEMPORALGRAPH_H
 #define TEMPORALGRAPH_H
 
+#include "../TemporalParameters.h"
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
@@ -10,6 +11,7 @@
 #include <stack>
 
 using namespace std;
+
 
 class TemporalEdge {
 public:
@@ -179,6 +181,15 @@ public:
 	bool debug;
 	bool refine;
 
+	int t_s;
+	int t_e;
+	int combonum;
+	int duration;
+	double phi;
+
+	int window_width;
+	int window_step;
+
 	TemporalGraph() {
 		//r_all = 0;
 		tom_all = 0;
@@ -219,6 +230,59 @@ public:
 		th_alpha = (exp(1.0 / th_score - 1) - 1) / (th_ev2 - th_beta);
 		th_topo_alpha = (exp(1.0 / th_score - 1) - 1) / (th_topo_beta - th_topo_half);
 		th_io_alpha = (exp(1.0 / th_score - 1) - 1) / (th_io_beta - th_io_half);
+
+		window_width = 0;
+		window_step = 0;
+	}
+
+	TemporalGraph(TemporalParameters& cpara) {
+		//r_all = 0;
+		tom_all = 0;
+		debug = false;
+		iorate = 0;
+		tspan = 0;
+		corerate = 0;
+		testnum = 0;
+		avgts = 0;
+
+		sRecorder = vector<unordered_map<string, double>>(2);
+		scode = 0;
+
+		handlenum = 0;
+		posnum = 0;
+		timesum = 0;
+
+		positivenum = 0;
+		negtivenum = 0;
+
+		negt = 0;
+		negio = 0;
+		negtopo = 0;
+		negall = 0;
+		post = 0;
+		posio = 0;
+		postopo = 0;
+
+		th_score = 0.5;
+		th_ev2 = cpara.th_ev2;
+		th_beta = cpara.th_beta;
+		th_io_half = cpara.th_io_half;
+		th_io_beta = cpara.th_io_beta;
+		kcore = cpara.kcore;
+		th_topo_half = cpara.th_topo_half;
+		th_topo_beta = cpara.th_topo_beta;
+
+		t_s = cpara.t_s;
+		t_e = cpara.t_e;
+		duration = cpara.duration;
+		combonum = cpara.combonum;
+		phi = cpara.phi;
+		window_width = cpara.window_width;
+		window_step = cpara.window_step;
+
+		th_alpha = (exp(1.0 / th_score - 1) - 1) / (th_ev2 - th_beta);
+		th_topo_alpha = (exp(1.0 / th_score - 1) - 1) / (th_topo_beta - th_topo_half);
+		th_io_alpha = (exp(1.0 / th_score - 1) - 1) / (th_io_beta - th_io_half);
 	}
 
 	void clear() {
@@ -231,7 +295,8 @@ public:
 		nodenum = n;
 		t_edge_num = 0;
 		edge_num = 0;
-		graph = vector<unordered_map<int, vector<int>>*>(nodenum + 1, NULL);
+		temporal_graph = vector<unordered_map<int, vector<int>>>(nodenum + 1);
+		temporal_network = unordered_map<int, unordered_set<int>>();
 		degree = vector<int>(nodenum + 1, 0);
 		sum_t_vertex = vector<vector<int>>(nodenum + 1);
 		comm_map = vector<int>(nodenum + 1, 0);

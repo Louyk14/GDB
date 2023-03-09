@@ -37,7 +37,7 @@ typedef std::priority_queue<std::pair<std::pair<VertexID, ui>, ui>, std::vector<
 class DAF
 {
 public:
-    DAF(MemoryGraph* data_graph, MemoryGraph* query_graph);
+    DAF(MemoryGraph* data_graph, MemoryGraph* query_graph, MemoryGraph* d);
     DAF();
     ~DAF();
 
@@ -284,9 +284,9 @@ public:
 
     //dense
     size_t startMatchDense();
-    bool DPisoFilterDense(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
+    bool DPisoFilterDense(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
                             ui *&order, TreeNode *&tree);
-    bool LDFFilterDense(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count);
+    bool LDFFilterDense(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count);
     size_t exploreDPisoStyleDense(const MemoryGraph *data_graph, const MemoryGraph *query_graph, TreeNode *tree,
                                         ui **candidates, ui *candidates_count, ui *order);
 
@@ -294,8 +294,8 @@ public:
     size_t startMatchBound();
     size_t exploreDPisoStyleBound(const MemoryGraph *data_graph, const MemoryGraph *query_graph, TreeNode *tree,
                                         ui **candidates, ui *candidates_count, ui *order);
-    bool LDFFilterBound(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count);
-    bool DPisoFilterBound(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
+    bool LDFFilterBound(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count);
+    bool DPisoFilterBound(MemoryGraph *data_graph, MemoryGraph *query_graph, ui **&candidates, ui *&candidates_count,
                             ui *&order, TreeNode *&tree);
 	//void buildTables_comm_overall(const MemoryGraph *data_graph, const MemoryGraph *query_graph, ui **candidates, ui *candidates_count, Edges** edge_matrix);
 

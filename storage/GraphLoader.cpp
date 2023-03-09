@@ -107,6 +107,80 @@ void GraphLoader::readGraphFromFile(MemoryGraph& graph, string file, string labe
 	initAfterReadNetwork(graph, labelfile);
 }
 
+void GraphLoader::loadTemporalInfo(MemoryGraph& graph, string& temporal_info_path) {
+	fstream input(temporal_info_path, ios::in);
+	
+	graph.temporal_network = vector<unordered_map<int, vector<vector<int>>>>(graph.nodeNum + 1);
+	graph.t_edge_num = 0;
+
+	int start, end, type, num;
+	while (input >> start >> end >> type >> num) {
+		if (graph.temporal_network[start][end].empty()) {
+			graph.temporal_network[start][end] = vector<vector<int>>(graph.labelnum + 1);
+		}
+		for (int i = 0; i < num; ++i) {
+			int timestamp;
+			input >> timestamp;
+			graph.temporal_network[start][end][type].push_back(timestamp);
+		}
+
+		graph.t_edge_num += num;
+	}
+
+	graph.loadtemporal = true;
+	input.close();
+}
+
+void GraphLoader::writeTemporalInfo(MemoryGraph& graph, string& temporal_info_path) {
+	fstream output(temporal_info_path, ios::out);
+	if (graph.temporal_network.empty()) {
+		for (const auto& pair : graph.temporal_info) {
+			string cur = "";
+			for (int i = 0; i < pair.first.size(); ++i) {
+				if (pair.first[i] != ' ') {
+					cur += pair.first[i];
+				}
+				else {
+					output << cur << " ";
+					cur.clear();
+				}
+			}
+			output << cur << " " << pair.second.size() << " ";
+			cur.clear();
+
+			for (int i = 0; i < pair.second.size(); ++i) {
+				output << pair.second[i];
+				if (i != pair.second.size() - 1) {
+					output << " ";
+				}
+			}
+			output << endl;
+		}
+	}
+	else {
+		for (int i = 0; i < graph.temporal_network.size(); ++i) {
+			for (const auto& neigh : graph.temporal_network[i]) {
+				int node2 = neigh.first;
+				for (int j = 0; j < neigh.second.size(); ++j) {
+					if (neigh.second[j].size() > 0) {
+						output << i << " " << node2 << " " << j << " " << neigh.second[j].size() << " ";
+						for (int k = 0; k < neigh.second[j].size(); ++k) {
+							output << neigh.second[j][k];
+							if (k != neigh.second[j].size() - 1)
+								output << " ";
+						}
+					}
+				}
+
+				output << endl;
+			}
+		}
+	}
+
+	graph.loadtemporal = false;
+	output.close();
+}
+
 void GraphLoader::initAfterReadNetwork(MemoryGraph& graph, string labelfile) {
 	graph.nodeNum = graph.nodes.size();
 
@@ -138,7 +212,7 @@ void GraphLoader::readNetworkFromFile(MemoryGraph& graph, string file) {
 	{
 		if (buffer[0] == '#')continue;
 		if (liner == 0) {
-			sscanf(buffer, "%d %d", &graph.nodeNum, &graph.labelnum);
+			sscanf(buffer, "%d %d %d", &graph.nodeNum, &graph.labelnum, &graph.istemporal);
 			liner++;
 			graph.initNetwork(graph.nodeNum);
 			continue;
@@ -146,22 +220,78 @@ void GraphLoader::readNetworkFromFile(MemoryGraph& graph, string file) {
 		int nodeId1 = -1;
 		int nodeId2 = -1;
 		int type = 0;
-		if (graph.labelnum > 0) {
-			sscanf(buffer, "%d	%d	%d", &nodeId1, &nodeId2, &type);
+		int timestamp;
+
+		if (graph.nodeIdAlloterType == 0) {
+			if (!graph.istemporal) {
+				if (graph.labelnum > 0) {
+					sscanf(buffer, "%d	%d	%d", &nodeId1, &nodeId2, &type);
+				}
+				else {
+					sscanf(buffer, "%d	%d", &nodeId1, &nodeId2);
+				}
+			}
+			else {
+				if (graph.labelnum > 0) {
+					sscanf(buffer, "%d	%d	%d	%d", &nodeId1, &nodeId2, &type, &timestamp);
+				}
+				else {
+					sscanf(buffer, "%d	%d	%d", &nodeId1, &nodeId2, &timestamp);
+				}
+			}
+
+			if (nodeId1 == nodeId2) {
+				continue;
+			}
+
+			nodeId1 = graph.nodeIdAlloter.i2iAlloter->allotId(nodeId1);
+			nodeId2 = graph.nodeIdAlloter.i2iAlloter->allotId(nodeId2);
 		}
 		else {
-			sscanf(buffer, "%d	%d", &nodeId1, &nodeId2);
+			string node1str, node2str;
+			if (!graph.istemporal) {
+				if (graph.labelnum > 0) {
+					sscanf(buffer, "%s	%s	%d", &node1str, &node2str, &type);
+				}
+				else {
+					sscanf(buffer, "%s	%s", &node1str, &node2str);
+				}
+			}
+			else {
+				if (graph.labelnum > 0) {
+					sscanf(buffer, "%s	%s	%d	%d", &node1str, &node2str, &type, &timestamp);
+				}
+				else {
+					sscanf(buffer, "%s	%s	%d", &node1str, &node2str, &timestamp);
+				}
+			}
+
+			if (node1str == node2str) {
+				continue;
+			}
+
+			nodeId1 = graph.nodeIdAlloter.s2iAlloter->allotId(node1str);
+			nodeId2 = graph.nodeIdAlloter.s2iAlloter->allotId(node2str);
 		}
 
-		if (nodeId1 == nodeId2)
-		{
-			continue;
+		graph.netWorkSet[nodeId1][nodeId2].push_back(type);	
+		
+		if (graph.istemporal) {
+			string signal = to_string(nodeId1) + ' ' + to_string(nodeId2) + ' ' + to_string(type);
+			graph.temporal_info[signal].push_back(timestamp);
 		}
 
-		graph.netWorkSet[nodeId1][nodeId2].push_back(type);
 		graph.nodeEdges[nodeId1]++;
 	}
 	inFile.close();
+
+	if (graph.istemporal) {
+		graph.loadtemporal = true;
+
+		for (auto& pair : graph.temporal_info) {
+			sort(pair.second.begin(), pair.second.end());
+		}
+	}
 
 	cout << "finish read network" << endl;
 
@@ -408,6 +538,52 @@ void GraphLoader::writeEdgeDestHead(MemoryGraph& graph, string& filepath)
 		if (graph.edge_dest_head[i].block_pos != -1) {
 			outfile << i << " " << graph.edge_dest_head[i].block_pos << " " << graph.edge_dest_head[i].list_index << " " << graph.edge_dest_head[i].edge_index << endl;
 		}
+	}
+
+	outfile.close();
+}
+
+void GraphLoader::loadNodeLabels(MemoryGraph& graph, string& labelpath)
+{
+	ifstream infile(labelpath);
+	if (infile.fail())
+	{
+		cerr << "读取文件错误" << endl;
+		return;
+	}
+
+	string buffer = "";
+
+	int n = graph.getMaxNodeId();
+
+	graph.nodeLabels = vector<int>(n + 1, -1);
+
+	// vector<int> existIds = vector<int>(m + 1, 0);
+
+	if (infile.fail())
+	{
+		cerr << "读取文件错误" << endl;
+		return;
+	}
+
+	int node_id, labelid;
+
+	while (getline(infile, buffer)) {
+		istringstream iss;
+		iss.str(buffer);
+
+		iss >> node_id >> labelid;
+		graph.nodeLabels[node_id] = labelid;
+	}
+	infile.close();
+}
+
+void GraphLoader::writeNodeLabels(MemoryGraph& graph, string& labelpath)
+{
+	ofstream outfile(labelpath);
+
+	for (int i = 1; i < graph.nodeLabels.size(); ++i) {
+		outfile << i << " " << graph.nodeLabels[i] << endl;
 	}
 
 	outfile.close();

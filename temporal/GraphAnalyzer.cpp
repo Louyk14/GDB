@@ -6,11 +6,11 @@ void GraphAnalyzer::computeMetric(TemporalGraph& g, vector<int>& nodes, int t_s,
 	vector<int> coh;
 	for (int i1 = 0; i1 < nodes.size(); ++i1) {
 		int n1 = nodes[i1];
-		if (g.graph[n1] != NULL) {
+		if (!g.temporal_graph[n1].empty()) {
 			for(int i2 = i1; i2 < nodes.size(); ++i2) {
 				int n2 = nodes[i2];
-				if (g.graph[n1]->find(n2) != g.graph[n1]->end()) {
-					for (const auto& t : (*g.graph[n1])[n2]) {
+				if (g.temporal_graph[n1].find(n2) != g.temporal_graph[n1].end()) {
+					for (const auto& t : g.temporal_graph[n1][n2]) {
 						if (t >= t_s && t <= t_e) {
 							coh.push_back(t);
 							if (t > maxtime || maxtime == -1)
@@ -30,11 +30,11 @@ void GraphAnalyzer::computeMetric(TemporalGraph& g, vector<int>& nodes, int t_s,
 	unordered_set<int> nset(nodes.begin(), nodes.end());
 	for (int i1 = 0; i1 < nodes.size(); ++i1) {
 		int n1 = nodes[i1];
-		if (g.graph[n1] != NULL) {
-			for(const auto& n2p : *g.graph[n1]) {
+		if (!g.temporal_graph[n1].empty()) {
+			for(const auto& n2p : g.temporal_graph[n1]) {
 				int n2 = n2p.first;
-				if (g.graph[n1]->find(n2) != g.graph[n1]->end()) {
-					for (const auto& t : (*g.graph[n1])[n2]) {
+				if (g.temporal_graph[n1].find(n2) != g.temporal_graph[n1].end()) {
+					for (const auto& t : g.temporal_graph[n1][n2]) {
 						if (t >= t_s && t <= t_e) {
 							if (nset.find(n2) != nset.end()) {
 								if (n1 <= n2) {
@@ -59,9 +59,9 @@ void GraphAnalyzer::computeMetric(TemporalGraph& g, vector<int>& nodes, int t_s,
 		
 		for (int i2 = i1; i2 < nodes.size(); ++i2) {
 			int n2 = nodes[i2];
-			if (g.graph[n1] != NULL && g.graph[n1]->find(n2) != g.graph[n1]->end()) {
+			if (!g.temporal_graph[n1].empty() && g.temporal_graph[n1].find(n2) != g.temporal_graph[n1].end()) {
 				bool once = false;
-				for (const auto& t : (*g.graph[n1])[n2]) {
+				for (const auto& t : g.temporal_graph[n1][n2]) {
 					if (t >= t_s && t <= t_e) {
 						if (!once) {
 							once = true;
@@ -146,10 +146,10 @@ double GraphAnalyzer::analyze(TemporalGraph& g, vector<int>& nodes, int t_s, int
 
 		for (int i2 = i1 + 1; i2 < nodes.size(); ++i2) {
 			int n2 = nodes[i2];
-			if (g.graph[n1] != NULL && g.graph[n1]->find(n2) != g.graph[n1]->end()) {
+			if (!g.temporal_graph[n1].empty() && g.temporal_graph[n1].find(n2) != g.temporal_graph[n1].end()) {
 				bool once = false;
-				sort((*g.graph[n1])[n2].begin(), (*g.graph[n1])[n2].end());
-				for (const auto& t : (*g.graph[n1])[n2]) {
+				sort(g.temporal_graph[n1][n2].begin(), g.temporal_graph[n1][n2].end());
+				for (const auto& t : g.temporal_graph[n1][n2]) {
 					if (t >= t_s && t <= t_e) {
 						if (!once) {
 							once = true;
@@ -408,11 +408,10 @@ double GraphAnalyzer::analyzeCase(TemporalGraph& g, vector<int>& nodes) {
 	return 0;
 }
 
-void GraphAnalyzer::timeSeries(TemporalGraph& g, vector<int> nodes, int starttime, int dur, int endtime, string outputfile) {
+void GraphAnalyzer::timeSeries(TemporalGraph& g, vector<int> nodes, int starttime, int dur, int endtime) {
 	int t_s = starttime;
 	int t_e = t_s + dur;
-	fstream out(outputfile, ios::out);
-	//cout << g.maxstamp << endl;
+	
 	int counter = 1;
 	//cout << t_s << endl;
 	bool start = false;
@@ -425,11 +424,11 @@ void GraphAnalyzer::timeSeries(TemporalGraph& g, vector<int> nodes, int starttim
 		//	start = true;
 		//if (start)
 		//	out << "[" << t_s << ", "<< t_e << "] " << ts << endl;
-		//cout << t_s << " " << t_e << " " << ts << endl;
+		cout << t_s << " " << t_e << " " << ts << endl;
 		//break;
-		out << ts << " " << counter << endl;
+		// out << ts << " " << counter << endl;
 		//t_s = t_e;
-		t_s = t_s + 1;
+		t_s = t_s + g.window_step;
 		//t_s++;
 		t_e = t_s + dur;
 		counter++;
@@ -440,7 +439,7 @@ void GraphAnalyzer::timeSeries(TemporalGraph& g, vector<int> nodes, int starttim
 		//if(counter >= 31)
 		//	break;
 	}
-	slog.close();
+	// slog.close();
 }
 
 bool GraphAnalyzer::isValidExtension(TemporalGraph& g, int qv, vector<int>& nodes, int v, vector<int>& distance) {
@@ -1412,55 +1411,18 @@ double GraphAnalyzer::analyzeIndex_dfs(TemporalGraph& g, vector<int>& nodes, uno
 
 void GraphAnalyzer::tsearch_dfs(TemporalGraph& g, int qv, double phi, int num, int t_s, int t_e) {
 	vector<int> window_edges;
-	g.temporal_graph = vector<unordered_map<int, vector<int>>>(g.graph.size());
-	g.temporal_network.clear();
+	//g.temporal_graph = vector<unordered_map<int, vector<int>>>(g.graph.size());
+	//g.temporal_network.clear();
 	cout << "start: " << t_s << " " << t_e << endl;
 	int tedge = 0;
 	int nedge = 0;
-	for (const auto& n1 : g.network) {
-		for (const auto& n2 : g.network[n1.first]) {
-			if (n1.first < n2) {
-				for (const auto& t : (*g.graph[n1.first])[n2]) {
-					if (t >= t_s && t <= t_e) {
-						g.temporal_network[n1.first].insert(n2);
-						g.temporal_network[n2].insert(n1.first);
-						break;
-					}
-					else if (t > t_e)
-						break;
-				}
-				if (g.temporal_network[n1.first].find(n2) != g.temporal_network[n1.first].end())
-					nedge++;
-			}
-		}
-	}
-
-	for (const auto& n1 : g.temporal_network) {
-		for (const auto& n2 : g.temporal_network[n1.first]) {
-			for (const auto& t : (*g.graph[n1.first])[n2]){
-				if (t >= t_s && t <= t_e) {
-					g.temporal_graph[n1.first][n2].push_back(t);
-					tedge++;
-				}
-				else if (t > t_e)
-					break;
-			}
-		}
-	}
-	cout << "EDGE: " << nedge << " " << tedge << " " << g.nodenum << endl;
-	//system("pause");c
-	for (auto& n1 : g.temporal_graph) {
-		for (auto& n2 : n1) {
-			sort(n2.second.begin(), n2.second.end());
-		}
-	}
-
+	
 	//buildIndex(g, t_s, t_e);
 
 	unordered_set<int> QR;
 	QR.insert(qv);
 	int hop = 1;
-	g.distance = vector<int>(g.graph.size(), -1);
+	g.distance = vector<int>(g.temporal_graph.size(), -1);
 	g.distance[qv] = 0;
 	unordered_set<int> rec;
 	rec.insert(qv);
@@ -2002,8 +1964,8 @@ void GraphAnalyzer::buildIndex(TemporalGraph& g, int t_s, int t_e) {
 				int maxt = -1;
 				int mint = -1;
 
-				if (g.graph[n1] != NULL && g.graph[n1]->find(n2) != g.graph[n1]->end()) {				
-					for (const auto& t : (*g.graph[n1])[n2]) {
+				if (!g.temporal_graph[n1].empty() && g.temporal_graph[n1].find(n2) != g.temporal_graph[n1].end()) {
+					for (const auto& t : g.temporal_graph[n1][n2]) {
 						if (t >= t_s && t <= t_e) {
 							if (maxt == -1 || maxt < t)
 								maxt = t;
@@ -2049,7 +2011,7 @@ void GraphAnalyzer::connectedComponents(TemporalGraph& g, int t_s, int t_e, vect
 	unordered_set<int> found;
 	int index = 0;
 
-	for (const auto& n : g.network) {
+	for (const auto& n : g.temporal_network) {
 		if (found.find(n.first) != found.end())
 			continue;
 
@@ -2065,8 +2027,8 @@ void GraphAnalyzer::connectedComponents(TemporalGraph& g, int t_s, int t_e, vect
 			found.insert(node);
 			cc_map[node] = index;
 
-			if (g.graph[node] != NULL) {
-				for (const auto& n2 : (*g.graph[node])) {
+			if (!g.temporal_graph[node].empty()) {
+				for (const auto& n2 : g.temporal_graph[node]) {
 					for (const auto& t : n2.second) {
 						if (t >= t_s && t <= t_e) {
 							if (found.find(n2.first) == found.end()) {

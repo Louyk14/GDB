@@ -105,7 +105,7 @@ VF2StateSuper::~VF2StateSuper()
 bool VF2StateSuper::CompareNodeAttribute(int n1, int n2)
 {
 	return true;
-	string n1type = (*g1->nodeAttributes)[n1]["TYPE"];
+	string n1type = g1->nodeAttributes[n1]["TYPE"];
 	unordered_set<string> n2type = (*g2->nodeAttributes)[n2]["TYPE"];
 
 	if (n2type.find(n1type) == n2type.end())
@@ -140,7 +140,7 @@ bool VF2StateSuper::CompareNodeAttribute(int n1, int n2)
 bool VF2StateSuper::CompareEdgeAttribute(int src1, int dst1, int src2, int dst2)
 {
 	return true;
-	string type1 = (*g1->edgeAttributes)[src1][dst1]["TYPE"];
+	string type1 = g1->edgeAttributes[src1][dst1]["TYPE"];
 	unordered_set<string> type2 = (*g2->edgeAttributes)[src2][dst2]["TYPE"];
 
 	if (type2.find(type1) == type2.end())

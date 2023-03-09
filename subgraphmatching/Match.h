@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../MemoryGraph.h"
+#include "../storage/GraphManager.h"
 //#include "MatchGraph.h"
 #include "TurboGraph.h"
 #include "TurboMatch.h"
@@ -22,9 +23,11 @@ class VF3State;
 
 class Match {
 public:
+	Match(GraphManager* gmanager, MemoryGraph* p);
 	Match(string datafile, string communityfile, string patternfile);
 	Match(MemoryGraph* datagraph, MemoryGraph* patterngraph, bool loadpattern=false, string patternfile="", bool loadcommunity=false, string communityfile="");
 
+	GraphManager* gm;
 	MemoryGraph* data;
 	MemoryGraph* pattern;
 	unordered_map<int, MemoryGraph*> communityGraphs;

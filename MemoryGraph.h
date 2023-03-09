@@ -48,7 +48,11 @@ public:
 	MemoryGraph(vector<int> n, unordered_map<int, unordered_map<string, string>>* na
 		, unordered_map<int, unordered_map<int, unordered_map<string, string>>>* ea
 		, vector<unordered_map<int, vector<int>>>* oe, vector<unordered_map<int, vector<int>>>* ie, int labnum
-		, vector<int>* nl = NULL);
+		, vector<int>* nl = NULL, bool pre = true);
+	MemoryGraph(vector<int> n, unordered_map<int, unordered_map<string, string>>* na
+		, unordered_map<int, unordered_map<int, unordered_map<string, string>>>* ea
+		, vector<unordered_map<int, vector<string>>>* oe, vector<unordered_map<int, vector<string>>>* ie, int labnum
+		, vector<string>* nl = NULL);
 	MemoryGraph(string file, string labelfile="");
 	MemoryGraph(MemoryGraph* mg);
 	~MemoryGraph();
@@ -70,6 +74,8 @@ public:
 	bool hasNodeLabel;
 	bool hasEdgeLabel;
 	GraphLoader* gLoader;
+	bool istemporal;
+	bool loadtemporal;
 
 	vector<int> nodes;
 	vector<int> communities;
@@ -80,6 +86,8 @@ public:
 	vector<int> nodeLabels;
 	vector<vector<vector<unordered_set<int>>>> commNetworkSet; // node - community - label - neighbours
 	vector<unordered_map<int, vector<int>>> netWorkSet;//保存所有边便于查找
+	unordered_map<string, vector<int>> temporal_info;
+	vector<unordered_map<int, vector<vector<int>>>> temporal_network;
 	vector<vector<int>> netWorkVec;
 	//unordered_map<int, unordered_map<int, unordered_set<int>>> netWorkSetComm;
 	//vector<unordered_set<int>> inNetWorkSet;
@@ -118,8 +126,8 @@ public:
 	vector<vector<int>> labelList;
 	//vector<vector<LabelVList*>> labelNetWorkVec; // include all labels, without is null
 
-	unordered_map<int, unordered_map<string, string>>* nodeAttributes;
-	unordered_map<int, unordered_map<int, unordered_map<string, string>>>* edgeAttributes;
+	unordered_map<int, unordered_map<string, string>> nodeAttributes;
+	unordered_map<int, unordered_map<int, unordered_map<string, string>>> edgeAttributes;
 	vector<unordered_map<int, vector<int>>>* outedges;
 	vector<unordered_map<int, vector<int>>>* inedges;
 	vector<vector<int>>* invec;
@@ -134,6 +142,9 @@ public:
 	int* largerbound;
 	int edgenum;
 	vector<int> idMapping;
+
+	// temporal combo searching related
+	int t_edge_num;
 	
 	// Storage related
 	
@@ -159,6 +170,7 @@ public:
 	unordered_map<int, int> nodeType;
 	unordered_map<int, int> node_startEdge;
 
+	void releaseNetwork();
 	void initNetwork(int n);
 	void initCommunity(int m, int n);
 	void init(int n, int m);
@@ -185,7 +197,7 @@ public:
 
 	void addEdge(int src, int dst, int type) {
 		netWorkSet[src][dst].push_back(type);
-		netWorkVec[src].push_back(dst);
+		// netWorkVec[src].push_back(dst);
 	}
 
 	void getdegrees();

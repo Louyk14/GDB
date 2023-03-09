@@ -580,6 +580,18 @@ bool VF3StateSelf::IsFeasiblePair(int node1, int node2)
 		|| n1outsize > (*g2->outedges)[node2].size())
 		return false;
 
+	if (g1->nodeAttributes[node1].size() != g2->nodeAttributes[node2].size())
+		return false;
+	for (const auto& attrpair : g1->nodeAttributes[node1]) {
+		if (g2->nodeAttributes[node2].find(attrpair.first) == g2->nodeAttributes[node2].end()
+			|| attrpair.second != g2->nodeAttributes[node2][attrpair.first]) {
+			return false;
+		}
+	}
+
+	if (g1->nodeLabels[node1] != g2->nodeLabels[node2])
+		return false;
+
 	int i, other1, other2, c_other;
 	//Edge1 eattr1;
 	//Edge2 eattr2;

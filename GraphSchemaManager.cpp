@@ -81,14 +81,14 @@ void GraphSchemaManager::dropSchema(string& schemaname) {
 	}
 }
 
-void GraphSchemaManager::dispatchSchema(string& schemaname, GraphSchema*& gschema, int type) {
+void GraphSchemaManager::dispatchSchema(string& gname, string& schemaname, GraphSchema*& gschema, int type) {
 	if (hasSchema(schemaname)) {
 		gschema = schemas[schemaname];
 		if (type == 0) {
-			schemas[schemaname]->addRelatedGraph(schemaname);
+			schemas[schemaname]->addRelatedGraph(gname);
 		}
 		else if (type == 1) {
-			schemas[schemaname]->addRelatedGraphSet(schemaname);
+			schemas[schemaname]->addRelatedGraphSet(gname);
 		}
 	}
 	else {

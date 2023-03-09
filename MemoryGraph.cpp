@@ -7,18 +7,40 @@ MemoryGraph::MemoryGraph() {
 	maxDegree = -1;
 	edgenum = 0;
 	hasNodeLabel = false;
+
+	istemporal = false;
+	loadtemporal = false;
 };
 
 MemoryGraph::MemoryGraph(vector<int> n, unordered_map<int, unordered_map<string, string>>* na
 	, unordered_map<int, unordered_map<int, unordered_map<string, string>>>* ea
 	, vector<unordered_map<int, vector<int>>>* oe, vector<unordered_map<int, vector<int>>>* ie, int labnum
-	, vector<int>* nl) {
+	, vector<int>* nl, bool pre) {
+	istemporal = false;
+	loadtemporal = false;
+
 	nodes = vector<int>(n);
+	nodeNum = nodes.size();
 	sort(nodes.begin(), nodes.end());
-	nodeAttributes = na;
-	edgeAttributes = ea;
-	outedges = oe;
-	inedges = ie;
+	if (na != NULL)
+		nodeAttributes = *na;
+	if (ea != NULL)
+		edgeAttributes = *ea;
+	outedges = new vector<unordered_map<int, vector<int>>>(*oe);
+	inedges = new vector<unordered_map<int, vector<int>>>(*ie);
+
+	if (netWorkSet.empty()) {
+		netWorkSet = vector<unordered_map<int, vector<int>>>(nodes.size() + 1);
+
+		for (int i = 0; i < nodes.size(); ++i) {
+			int curnode = nodes[i];
+			for (const auto& e : (*oe)[curnode]) {
+				netWorkSet[curnode][e.first] = e.second;
+				netWorkSet[e.first][curnode] = e.second;
+			}
+		}
+	}
+
 	labelnum = labnum;
 	if (nl != NULL)
 		hasNodeLabel = true;
@@ -37,10 +59,14 @@ MemoryGraph::MemoryGraph(vector<int> n, unordered_map<int, unordered_map<string,
 	inMaxDegree = -1;
 	maxDegree = -1;
 
-	preprocess();
+	if (pre)
+		preprocess();
 }
 
 MemoryGraph::MemoryGraph(string file, string labelfile) {
+	istemporal = false;
+	loadtemporal = false;
+
 	gLoader->readGraphFromFile(*this, file, labelfile);
 }
 
@@ -79,8 +105,8 @@ MemoryGraph::MemoryGraph(MemoryGraph* mg) {
 	maxDegree = mg->maxDegree;
 	labelList = mg->labelList;
 
-	nodeAttributes = new unordered_map<int, unordered_map<string, string>>(mg->nodeAttributes->begin(), mg->nodeAttributes->end());
-	edgeAttributes = new unordered_map<int, unordered_map<int, unordered_map<string, string>>>(mg->edgeAttributes->begin(), mg->edgeAttributes->end());
+	nodeAttributes = unordered_map<int, unordered_map<string, string>>(mg->nodeAttributes.begin(), mg->nodeAttributes.end());
+	edgeAttributes = unordered_map<int, unordered_map<int, unordered_map<string, string>>>(mg->edgeAttributes.begin(), mg->edgeAttributes.end());
 	outedges = new vector<unordered_map<int, vector<int>>>(mg->outedges->begin(), mg->outedges->end());
 	inedges = new vector<unordered_map<int, vector<int>>>(mg->inedges->begin(), mg->inedges->end());
 	invec = new vector<vector<int>>(mg->invec->begin(), mg->invec->end());
@@ -447,6 +473,20 @@ void MemoryGraph::getdegrees() {
 	avgdegree = (double)degree_sum / nodeNum;
 }
 
+void MemoryGraph::releaseNetwork() {
+	netWorkSet.clear();
+	nodeEdges.clear();
+	destIter.clear();
+	typeIter.clear();
+	edge_dest_head.clear();
+	nodeblock.clear();
+	nodeLabels.clear();
+
+	if (hasNodeLabel) {
+		delete labelEdgesVec;
+	}
+}
+
 void MemoryGraph::initNetwork(int n) {
 	netWorkSet = vector<unordered_map<int, vector<int>>>(n + 1);
 	nodeEdges = vector<int>(n + 1, 0);
@@ -460,6 +500,7 @@ void MemoryGraph::initNetwork(int n) {
 void MemoryGraph::initCommunity(int m, int n) {
 	communityNodes = vector<vector<int>>(m + 1);
 	nodeInfo = vector<vector<int>>(n + 1);
+	nodeLabels = vector<int>(n + 1, 0);
 	nodeCommunitySet = vector<unordered_set<int>>(n + 1);
 }
 

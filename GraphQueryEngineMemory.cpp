@@ -1,42 +1,28 @@
 #include "GraphQueryEngineMemory.h"
 
-void ComboParameters::setPara(vector<double>& parameters) {
-	if (parameters.empty())
-		return;
-
-	th_score = parameters[0];
-	th_ev2 = parameters[1];
-	th_beta = parameters[2];
-	th_io_half = parameters[3];
-	th_io_beta = parameters[4];
-	kcore = parameters[5];
-	th_topo_beta = parameters[6];
-	th_topo_half = 1 - 1.0 / kcore;
-
-	th_alpha = (exp(1.0 / th_score - 1) - 1) / (th_ev2 - th_beta);
-	th_topo_alpha = (exp(1.0 / th_score - 1) - 1) / (th_topo_beta - th_topo_half);
-	th_io_alpha = (exp(1.0 / th_score - 1) - 1) / (th_io_beta - th_io_half);
-}
 
 GraphQueryEngineMemory::GraphQueryEngineMemory() {
-	comboParamemters = new ComboParameters();
+	temporalParamemters = new TemporalParameters();
 }
 
 GraphQueryEngineMemory::~GraphQueryEngineMemory() {
-	delete comboParamemters;
+	delete temporalParamemters;
 }
 
-void GraphQueryEngineMemory::subgraphMatchingQuery(GraphManager* gm, SubgraphMatchType smtype) {
+void GraphQueryEngineMemory::subgraphMatchingQuery(GraphManager* gm, MemoryGraph* p, SubgraphMatchType smtype) {
 	if (!gm->inMemory) {
 		cout << "Apply memory subgraph matching algorithm to graph not in the memory!" << endl;
-		return;
+		// return;
+		gm->setInMemory();
 	}
 
 	//GraphSet patternGraphSet;
 	//evalToGraphSet(*selectstat.whereCondition, patternGraphSet);
 
-	string graphpath, commpath, pattenpath;
-	Match match(graphpath, commpath, pattenpath);
+	// string graphpath, commpath, pattenpath;
+	// Match match(graphpath, commpath, pattenpath);
+
+	Match match(gm, p);
 	
 	if (smtype == TURBOTYPE) {
 		match.GoMatch_Turbo_comm();
@@ -49,10 +35,24 @@ void GraphQueryEngineMemory::subgraphMatchingQuery(GraphManager* gm, SubgraphMat
 	}
 }
 
-void GraphQueryEngineMemory::comboSearching(GraphManager* gm, ComboParameters* cpara, int qv, int combonum, int t_s, int duration, int t_e, double phi) {
-	TemporalSearch ts;
-	TemporalGraph tg;
-	string inputfile, outputfile;
+void GraphQueryEngineMemory::comboSearching(GraphManager* gm, string& configfile, int qv) {
+	gm->gLoader->loadTemporalInfo(*gm->mGraph, gm->temporal_info_path);
 
-	ts.comboSearching(tg, inputfile, outputfile, qv, combonum, t_s, duration, t_e, phi);
+	TemporalParameters cpara(configfile);
+	TemporalSearch ts(gm->mGraph, cpara);
+	
+	ts.analyze();
+
+	ts.comboSearching(qv);
+}
+
+void GraphQueryEngineMemory::evolutionTracking(GraphManager* gm, string& configfile, vector<int>& qvs) {
+	gm->gLoader->loadTemporalInfo(*gm->mGraph, gm->temporal_info_path);
+
+	TemporalParameters epara(configfile);
+	TemporalSearch ts(gm->mGraph, epara);
+
+	ts.analyze();
+
+	ts.evolutionTracking(qvs);
 }

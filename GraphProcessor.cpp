@@ -2,6 +2,9 @@
 
 GraphProcessor::GraphProcessor(GraphDatabase* db) {
 	gdb = db;
+
+	wcg = new WhereConditionGraph();
+	fcg = new FromConditionGraph();
 }
 
 void GraphProcessor::exec(Statement& stat) {
@@ -121,6 +124,9 @@ void GraphProcessor::exec_dml(DMLStatement& stat) {
 	else if (stat.type == REMOVE_TYPE) {
 		exec_remove_stat(*stat.removeStatement);
 	}
+	else if (stat.type == QUERY_TYPE) {
+		exec_query_stat(*stat.queryStatement);
+	}
 }
 
 void GraphProcessor::createGraph(string gname) {
@@ -129,4 +135,46 @@ void GraphProcessor::createGraph(string gname) {
 
 void GraphProcessor::createGraphSet(Statement& stat) {
 
+}
+
+void GraphProcessor::exec_query_stat(QueryStatement& stat) {
+	if (stat.type == SELECT_OPERATION_TYPE) {
+		exec_select_stat(*stat.selectStatement);
+	}
+}
+
+void GraphProcessor::exec_select_stat(SelectStatement& stat) {
+	wcg->init(stat.whereCondition);
+	fcg->init(stat.fromCondition);
+
+	if (wcg->type == WHERE_FILENAME_TYPE) {
+		wcg->querytype = "subgraph";
+		gdb->selectFromGraphSet(fcg, wcg);
+	}
+	else if (wcg->type == WHERE_FIRSTORDER_TYPE) {
+		deal_with_first_order_stat(*stat.whereCondition->firstOrderStat);
+	}
+};
+
+void GraphProcessor::deal_with_first_order_stat(FirstOrderStat& stat) {
+	if (stat.type == FIRST_ORDER_STAT_UNIT_TYPE) {
+		deal_with_first_order_unit(*stat.firstOrderUnit);
+	}
+}
+
+void GraphProcessor::deal_with_first_order_unit(FirstOrderUnit& stat) {
+	if (stat.type == FUNC_TYPE) {
+		wcg->querytype = stat.funcstat->funcName;
+		if (!stat.funcstat->objList.empty()) {
+			string first = stat.funcstat->objList[0];
+			wcg->paras.clear();
+			for (int i = 0; i < stat.funcstat->objList.size(); ++i) {
+				wcg->paras.push_back(stat.funcstat->objList[i]);
+			}
+			if (first.substr(0, 7) == "'-file ") {
+				wcg->related_file = first.substr(7, first.size() - 8);
+				gdb->selectFromGraphSet(fcg, wcg);
+			}
+		}
+	}
 }
